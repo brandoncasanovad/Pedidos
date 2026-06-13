@@ -36,17 +36,16 @@ h2{font-size:17px;font-weight:700;margin:18px 0 10px}h2:first-child{margin-top:0
 .card{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
 .card-pad{padding:14px}
 
-/* ---- fila de producto con formato ---- */
 .prow{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--fondo);flex-wrap:wrap}
 .prow:last-child{border-bottom:none}
 .pname{font-size:15px;flex:1;min-width:120px}
 .prow-ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .qty{display:flex;align-items:center;gap:6px}
-.qbtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--borde);background:var(--blanco);font-size:22px;cursor:pointer;color:var(--txt);line-height:1}
-.qbtn:active{background:var(--azul-c)}
+.qbtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--borde);background:rgba(255,255,255,0.6);font-size:22px;cursor:pointer;color:inherit;line-height:1}
+.qbtn:active{opacity:0.7}
 .qval{min-width:34px;text-align:center;font-size:17px;font-weight:700}
 .fmt-wrap{display:flex;align-items:center;gap:6px}
-.fmt-select{padding:8px 10px;border-radius:10px;border:1.5px solid var(--borde);font-size:14px;background:var(--blanco);color:var(--txt);max-width:130px}
+.fmt-select{padding:8px 10px;border-radius:10px;border:1.5px solid var(--borde);font-size:14px;background:rgba(255,255,255,0.7);color:inherit;max-width:130px}
 .fmt-libre{padding:8px 10px;border-radius:10px;border:1.5px solid var(--ambar);font-size:14px;background:var(--ambar-c);color:var(--txt);width:110px;display:none}
 .fmt-libre.show{display:block}
 
@@ -61,7 +60,6 @@ h2{font-size:17px;font-weight:700;margin:18px 0 10px}h2:first-child{margin-top:0
 .btn-sm{padding:10px 14px;font-size:14px;width:auto}
 .btn-rojo-b{background:var(--blanco);border:1.5px solid var(--rojo);color:var(--rojo-t)}
 
-/* almacén */
 .phead{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
 .pavatar{width:42px;height:42px;border-radius:50%;background:var(--azul-c);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .pinfo{flex:1;min-width:0}.ptitle{font-size:15px;font-weight:700}
@@ -83,7 +81,6 @@ h2{font-size:17px;font-weight:700;margin:18px 0 10px}h2:first-child{margin-top:0
 .cbtn.sel{border-color:var(--txt);transform:scale(1.12)}
 .acciones{display:flex;gap:10px;margin-top:12px}.acciones .btn{flex:1}
 
-/* albaranes */
 .filtros{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 select,input[type=text],input[type=url]{padding:11px 12px;border-radius:10px;border:1.5px solid var(--borde);font-size:14px;background:var(--blanco);color:var(--txt)}
 .filtros select{flex:1;min-width:140px}
@@ -99,7 +96,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 .empty{text-align:center;padding:50px 20px;color:var(--gris)}
 .empty .ico{font-size:40px;display:block;margin-bottom:10px}
 
-/* ajustes */
 .cfg-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .cfg-row label{font-size:13px;font-weight:600;color:var(--gris)}
 .cfg-row input{width:100%}
@@ -110,11 +106,16 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 .add-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--fondo);flex-wrap:wrap}
 .add-row input,.add-row select{flex:1;min-width:80px}
 
-/* formatos por producto en ajustes */
 .fmt-tag{display:inline-flex;align-items:center;gap:5px;background:var(--azul-c);color:var(--azul-o);border-radius:20px;padding:4px 10px;font-size:13px;font-weight:600;margin:2px}
 .fmt-tag button{background:none;border:none;cursor:pointer;color:var(--azul-o);font-size:15px;line-height:1;padding:0 2px}
 .fmt-add-row{display:flex;gap:6px;margin-top:6px}
 .fmt-add-row input{flex:1;min-width:0;padding:8px 10px;font-size:13px}
+
+.color-swatch{width:16px;height:16px;border-radius:50%;border:1.5px solid rgba(0,0,0,0.15);display:inline-block;vertical-align:middle;margin-right:4px;flex-shrink:0}
+.color-picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;align-items:center}
+.cp-btn{width:24px;height:24px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;flex-shrink:0}
+.cp-btn.sel{border-color:#333;transform:scale(1.15)}
+.cp-none{background:#eee;font-size:11px;display:flex;align-items:center;justify-content:center;color:#666}
 
 .refresh-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .btn-refresh{background:var(--blanco);border:1.5px solid var(--borde);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--gris)}
@@ -146,7 +147,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 
 <div class="container">
 
-<!-- ===== PANTALLA 0: PEDIDOS ===== -->
 <div class="screen active" id="s0">
   <h2>Punto de venta</h2>
   <div class="chips" id="pv-chips"></div>
@@ -160,7 +160,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
   <button class="btn btn-azul" id="btn-enviar" onclick="enviarPedido()" disabled>📤 Enviar pedido a almacén</button>
 </div>
 
-<!-- ===== PANTALLA 1: ALMACÉN ===== -->
 <div class="screen" id="s1">
   <div class="refresh-bar">
     <h2 style="margin:0">Pedidos pendientes</h2>
@@ -174,7 +173,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
   <div id="lista-pedidos"></div>
 </div>
 
-<!-- ===== PANTALLA 2: ALBARANES ===== -->
 <div class="screen" id="s2">
   <div class="refresh-bar">
     <h2 style="margin:0">Histórico de albaranes</h2>
@@ -192,7 +190,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
   <div id="lista-albaranes"></div>
 </div>
 
-<!-- ===== PANTALLA 3: AJUSTES ===== -->
 <div class="screen" id="s3">
   <h2>Conexión a la base de datos</h2>
   <div class="card card-pad">
@@ -201,7 +198,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
     <button class="btn btn-azul" onclick="guardarConexion()">💾 Guardar y conectar</button>
     <p class="muted" style="margin-top:10px" id="cfg-estado">Sin conectar</p>
   </div>
-
   <h2>Puntos de venta</h2>
   <div class="card">
     <div class="lista-admin" id="admin-pvs"></div>
@@ -210,7 +206,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
       <button class="btn btn-azul btn-sm" onclick="agregarPV()">+ Añadir</button>
     </div>
   </div>
-
   <h2>Áreas</h2>
   <div class="card">
     <div class="lista-admin" id="admin-areas"></div>
@@ -219,10 +214,9 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
       <button class="btn btn-azul btn-sm" onclick="agregarArea()">+ Añadir</button>
     </div>
   </div>
-
   <h2>Catálogo de productos</h2>
   <div class="card card-pad">
-    <p class="muted" style="margin-bottom:12px">El Excel debe tener columnas: <b>Producto, Unidad, Area, Formatos</b> (la columna Formatos es opcional; escribe los formatos separados por comas: <i>Unidad, Caja 6ud, Garrafa</i>).</p>
+    <p class="muted" style="margin-bottom:12px">Columnas Excel: <b>Producto, Area, Formatos</b> (opcional: <b>Unidad, Color</b>). Colores disponibles: amarillo, verde, azul, rojo, naranja, morado, rosa, negro, gris.</p>
     <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(event)">
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-borde btn-sm" onclick="document.getElementById('excel-input').click()">📥 Importar Excel (añadir)</button>
@@ -230,7 +224,7 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
     </div>
     <p class="muted" style="margin-top:10px" id="prod-count"></p>
   </div>
-  <div class="card" id="admin-prods-card">
+  <div class="card">
     <div class="lista-admin" id="admin-prods"></div>
     <div class="add-row">
       <input type="text" id="np-nombre" placeholder="Producto" style="flex:2">
@@ -240,9 +234,8 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
     </div>
   </div>
 </div>
-</div><!-- /container -->
+</div>
 
-<!-- Modal conexión inicial -->
 <div class="overlay" id="overlay-conexion">
   <div class="modal">
     <h3>👋 Configuración inicial</h3>
@@ -252,7 +245,6 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
     <button class="btn btn-azul" onclick="conectarDesdeModal()">Conectar</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -263,12 +255,34 @@ let pollTimer=null;
 
 const FORMATOS_DEFAULT=['Unidad','Caja','Saco','Palet','Bolsa','Botella','Garrafa','Paquete','Rollo','Barril'];
 
+// Mapa de colores: nombre → {bg, text}
+const COLORES={
+  amarillo:{bg:'#FFF9C4',txt:'#5D4037'},
+  verde:    {bg:'#DCEDC8',txt:'#1B5E20'},
+  azul:     {bg:'#BBDEFB',txt:'#0D47A1'},
+  rojo:     {bg:'#FFCDD2',txt:'#7F0000'},
+  naranja:  {bg:'#FFE0B2',txt:'#7f3100'},
+  morado:   {bg:'#E1BEE7',txt:'#4A148C'},
+  rosa:     {bg:'#FCE4EC',txt:'#880E4F'},
+  negro:    {bg:'#263238',txt:'#ECEFF1'},
+  gris:     {bg:'#ECEFF1',txt:'#37474F'},
+};
+
+function normColor(s){
+  const m={amarillo:'amarillo',yellow:'amarillo',verde:'verde',green:'verde',azul:'azul',blue:'azul',rojo:'rojo',red:'rojo',naranja:'naranja',orange:'naranja',morado:'morado',purple:'morado',rosa:'rosa',pink:'rosa',negro:'negro',black:'negro',gris:'gris',grey:'gris',gray:'gris'};
+  return m[String(s||'').toLowerCase().trim()]||null;
+}
+function colorStyle(c){
+  const col=COLORES[c];
+  if(!col)return'';
+  return`background:${col.bg};color:${col.txt};`;
+}
+
 function $(id){return document.getElementById(id)}
 function toast(msg,err){const t=$('toast');t.textContent=msg;t.classList.toggle('error',!!err);t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fechaES(iso){const d=new Date(iso);return d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})+' · '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}
 
-// ---------- CONEXIÓN ----------
 function initConexion(){
   const url=localStorage.getItem('sb_url'),key=localStorage.getItem('sb_key');
   if(url&&key){sb=supabase.createClient(url,key);$('cfg-url').value=url;$('cfg-key').value=key;$('cfg-estado').textContent='✅ Conectado a '+url;cargarTodo()}
@@ -286,7 +300,6 @@ function conectar(url,key){
 function conectarDesdeModal(){conectar($('m-url').value,$('m-key').value)}
 function guardarConexion(){conectar($('cfg-url').value,$('cfg-key').value)}
 
-// ---------- CARGA ----------
 async function cargarTodo(){await Promise.all([cargarCatalogo(),cargarPedidos(),cargarAlbaranes()])}
 async function cargarCatalogo(){
   if(!sb)return;
@@ -322,7 +335,6 @@ async function cargarAlbaranes(manual){
   }catch(e){if(manual)toast('Error: '+(e.message||e),true)}
 }
 
-// ---------- NAV ----------
 function goTab(n){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.t==n));
   document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n));
@@ -332,9 +344,7 @@ function goTab(n){
   if(n===0)cargarCatalogo();
 }
 
-// ---------- PANTALLA PEDIDOS ----------
 function getFormatos(prod){
-  // formatos guardados en la BD (array) o FORMATOS_DEFAULT
   if(prod.formatos&&prod.formatos.length)return prod.formatos;
   return FORMATOS_DEFAULT;
 }
@@ -343,32 +353,29 @@ function renderPedidoUI(){
   $('pv-chips').innerHTML=DB.pvs.map(pv=>
     `<button class="chip ${pv.id===UI.pv?'active':''}" onclick="UI.pv='${pv.id}';renderPedidoUI()">${esc(pv.nombre)}</button>`
   ).join('')||'<p class="muted">Añade un punto de venta en ⚙️ Ajustes</p>';
-
   $('area-chips').innerHTML=DB.areas.map(a=>
     `<button class="chip area ${a.nombre===UI.area?'active':''}" onclick="UI.area='${esc(a.nombre)}';renderPedidoUI()">${esc(a.nombre)}</button>`
   ).join('')||'<p class="muted">Añade áreas en ⚙️ Ajustes</p>';
-
   const prods=DB.productos.filter(p=>p.area===UI.area);
   $('prod-empty').style.display=prods.length?'none':'block';
   $('prod-empty').textContent=DB.productos.length?'No hay productos en esta área':'Importa tu catálogo en ⚙️ Ajustes';
-
   $('prod-list').innerHTML=prods.map(p=>{
     const k=UI.pv+'|'+p.id;
     const q=UI.cant[k]||0;
     const fmts=getFormatos(p);
     const fmtActual=UI.fmt[k]||fmts[0];
-    const isLibre=fmtActual==='__libre__'||!fmts.includes(fmtActual)&&fmtActual!==fmts[0];
+    const isLibre=fmtActual==='__libre__';
     const selVal=isLibre?'__libre__':fmtActual;
-
     const options=fmts.map(f=>`<option value="${esc(f)}" ${selVal===f?'selected':''}>${esc(f)}</option>`).join('');
-
-    return `<div class="prow">
+    const col=normColor(p.color);
+    const st=col?colorStyle(col):'';
+    return `<div class="prow" style="${st}">
       <span class="pname">${esc(p.nombre)}</span>
       <div class="prow-ctrl">
         <div class="fmt-wrap">
-          <select class="fmt-select" id="fs_${k}" onchange="cambFmt('${k}',this.value,'${esc(p.id)}')">
+          <select class="fmt-select" id="fs_${k}" onchange="cambFmt('${k}',this.value)" style="${st?'background:rgba(255,255,255,0.5)':''}">
             ${options}
-            <option value="__libre__" ${selVal==='__libre__'?'selected':''}>✏️ Otro…</option>
+            <option value="__libre__" ${isLibre?'selected':''}>✏️ Otro…</option>
           </select>
           <input class="fmt-libre ${isLibre?'show':''}" id="fl_${k}" type="text" placeholder="Escribe formato" value="${isLibre?esc(UI.fmtLibre[k]||''):''}" oninput="UI.fmtLibre['${k}']=this.value;renderResumen()">
         </div>
@@ -386,7 +393,7 @@ function renderPedidoUI(){
 function cambFmt(k,val){
   UI.fmt[k]=val;
   const libre=$('fl_'+k);
-  if(libre){libre.classList.toggle('show',val==='__libre__')}
+  if(libre)libre.classList.toggle('show',val==='__libre__');
   renderResumen();
 }
 function camb(k,d){
@@ -394,16 +401,6 @@ function camb(k,d){
   const el=$('q_'+k);if(el)el.textContent=UI.cant[k];
   renderResumen();
 }
-
-function getFmtLabel(k){
-  const val=UI.fmt[k];
-  if(!val||val===UI.fmt[k]){
-    // default: primer formato del producto
-  }
-  if(val==='__libre__')return(UI.fmtLibre[k]||'').trim()||'?';
-  return val||FORMATOS_DEFAULT[0];
-}
-
 function itemsCarrito(){
   const out=[];
   for(const[k,q]of Object.entries(UI.cant)){
@@ -419,7 +416,6 @@ function itemsCarrito(){
   }
   return out;
 }
-
 function renderResumen(){
   const items=itemsCarrito(),r=$('resumen'),b=$('btn-enviar');
   if(!items.length){r.style.display='none';b.disabled=true;return}
@@ -430,7 +426,6 @@ function renderResumen(){
     `<div class="rarea">${esc(a)}</div>`+its.map(i=>`<div class="rrow"><span>${esc(i.nombre)}</span><b>${i.cantidad} × ${esc(i.formato)}</b></div>`).join('')
   ).join('');
 }
-
 async function enviarPedido(){
   const items=itemsCarrito();
   if(!items.length||!sb)return;
@@ -445,7 +440,6 @@ async function enviarPedido(){
   b.innerHTML='📤 Enviar pedido a almacén';
 }
 
-// ---------- ALMACÉN ----------
 function renderAlmacen(){
   const dot=$('dot-alm');
   dot.style.display=DB.pedidos.length?'inline-flex':'none';
@@ -517,7 +511,6 @@ async function generarAlbaran(pid){
   }catch(e){toast('Error: '+(e.message||e),true)}
 }
 
-// ---------- ALBARANES ----------
 function renderAlbaranes(){
   const fpv=$('f-pv'),vp=fpv.value;
   const pvsU=[...new Map(DB.albaranes.map(a=>[a.pv_id,a.pv_nombre])).entries()];
@@ -535,7 +528,7 @@ function renderAlbaranes(){
     const porArea={};
     a.items.forEach(i=>{(porArea[i.area]=porArea[i.area]||[]).push(i)});
     const filas=Object.entries(porArea).map(([area,its])=>
-      `<tr class="alb-area-row"><td colspan="5">${esc(area)}</td></tr>`+
+      `<tr class="alb-area-row"><td colspan="4">${esc(area)}</td></tr>`+
       its.map(i=>{
         const pl=i.color==='green'?'pl-g':i.color==='amber'?'pl-a':i.color==='red'?'pl-r':'';
         const tx=i.color==='green'?'Completo':i.color==='amber'?'Parcial':i.color==='red'?'Sin stock':'—';
@@ -567,23 +560,29 @@ function renderAlbaranes(){
 }
 function toggleAlb(id){UI.albAbiertos.has(id)?UI.albAbiertos.delete(id):UI.albAbiertos.add(id);renderAlbaranes()}
 
-// ---------- ADMIN ----------
 function renderAdmin(){
   $('admin-pvs').innerHTML=DB.pvs.map(pv=>
     `<div class="lrow"><span class="nom">🏪 ${esc(pv.nombre)}</span><button class="del" onclick="borrarPV('${pv.id}')">🗑️</button></div>`
   ).join('')||'<div class="lrow"><span class="nom muted">Sin puntos de venta</span></div>';
-
   $('admin-areas').innerHTML=DB.areas.map(a=>
     `<div class="lrow"><span class="nom">📍 ${esc(a.nombre)}</span><button class="del" onclick="borrarArea('${a.id}','${esc(a.nombre)}')">🗑️</button></div>`
   ).join('')||'<div class="lrow"><span class="nom muted">Sin áreas</span></div>';
-
   $('np-area').innerHTML=DB.areas.map(a=>`<option value="${esc(a.nombre)}">${esc(a.nombre)}</option>`).join('');
   $('prod-count').textContent=DB.productos.length+' productos en el catálogo';
+
+  const COLORES_ADMIN=[
+    {k:'amarillo',bg:'#FFF9C4'},{k:'verde',bg:'#DCEDC8'},{k:'azul',bg:'#BBDEFB'},
+    {k:'rojo',bg:'#FFCDD2'},{k:'naranja',bg:'#FFE0B2'},{k:'morado',bg:'#E1BEE7'},
+    {k:'rosa',bg:'#FCE4EC'},{k:'negro',bg:'#263238'},{k:'gris',bg:'#ECEFF1'},
+  ];
 
   $('admin-prods').innerHTML=DB.productos.slice(0,300).map(p=>{
     const fmts=getFormatos(p);
     const tags=fmts.map((f,i)=>`<span class="fmt-tag">${esc(f)}<button onclick="quitarFmt('${p.id}',${i})">×</button></span>`).join('');
-    return `<div class="lrow" style="flex-direction:column;align-items:flex-start;gap:6px">
+    const colActual=normColor(p.color);
+    const cpBtns=COLORES_ADMIN.map(c=>`<button class="cp-btn ${colActual===c.k?'sel':''}" style="background:${c.bg}" title="${c.k}" onclick="setColorProd('${p.id}','${c.k}')"></button>`).join('');
+    const st=colActual?colorStyle(colActual):'';
+    return `<div class="lrow" style="flex-direction:column;align-items:flex-start;gap:6px;${st}">
       <div style="display:flex;width:100%;align-items:center">
         <span class="nom"><b>${esc(p.nombre)}</b> <span class="muted">· ${esc(p.unidad)} · ${esc(p.area)}</span></span>
         <button class="del" onclick="borrarProducto('${p.id}')">🗑️</button>
@@ -591,12 +590,22 @@ function renderAdmin(){
       <div style="padding-left:2px">
         ${tags}
         <div class="fmt-add-row">
-          <input type="text" id="nf_${p.id}" placeholder="+ formato (ej: Caja 12ud)" onkeydown="if(event.key==='Enter')addFmt('${p.id}')">
+          <input type="text" id="nf_${p.id}" placeholder="+ formato" onkeydown="if(event.key==='Enter')addFmt('${p.id}')">
           <button class="btn btn-azul btn-sm" onclick="addFmt('${p.id}')">+</button>
         </div>
       </div>
+      <div class="color-picker">${cpBtns}
+        <button class="cp-btn cp-none ${!colActual?'sel':''}" title="Sin color" onclick="setColorProd('${p.id}','')">✕</button>
+      </div>
     </div>`;
   }).join('')||'<div class="lrow"><span class="nom muted">Catálogo vacío</span></div>';
+}
+
+async function setColorProd(prodId, color){
+  const p=DB.productos.find(x=>x.id===prodId);if(!p)return;
+  const{error}=await sb.from('productos').update({color:color||null}).eq('id',prodId);
+  if(error)return toast('Error: '+error.message,true);
+  p.color=color||null;renderAdmin();renderPedidoUI();
 }
 
 async function agregarPV(){
@@ -635,8 +644,6 @@ async function borrarProducto(id){
   if(error)return toast('Error: '+error.message,true);
   toast('Producto eliminado');cargarCatalogo();
 }
-
-// formatos por producto
 async function addFmt(prodId){
   const inp=$('nf_'+prodId);const val=inp.value.trim();if(!val)return;
   const p=DB.productos.find(x=>x.id===prodId);if(!p)return;
@@ -653,7 +660,6 @@ async function quitarFmt(prodId,idx){
   p.formatos=fmts;renderAdmin();
 }
 
-// ---------- EXCEL ----------
 function reemplazarCatalogo(){
   if(!confirm('Esto desactivará todo el catálogo actual. ¿Continuar?'))return;
   UI.modoReemplazo=true;$('excel-input').click();
@@ -673,17 +679,19 @@ async function importarExcel(ev){
     const cUni=claves.find(k=>['unidad','ud','medida'].includes(norm(k)));
     const cArea=claves.find(k=>['area','zona','seccion','departamento','categoria'].includes(norm(k)));
     const cFmts=claves.find(k=>['formatos','formatos_disponibles','opciones','formato'].includes(norm(k)));
+    const cColor=claves.find(k=>['color','colour','color_fondo','fondo'].includes(norm(k)));
     if(!cProd)return toast('No encuentro la columna Producto/Nombre',true);
     if(!cArea)return toast('No encuentro la columna Area/Zona',true);
     const nuevos=filas.filter(f=>String(f[cProd]).trim()).map(f=>{
-      // unidad: usa la columna Unidad si existe y no está vacía, si no 'ud'
       const unidad=(cUni&&String(f[cUni]).trim()&&String(f[cUni]).trim()!=='nan')?String(f[cUni]).trim():'ud';
       let formatos=null;
       if(cFmts&&String(f[cFmts]).trim()&&String(f[cFmts]).trim()!=='nan'){
         formatos=String(f[cFmts]).split(',').map(x=>x.trim()).filter(Boolean);
       }
       if(!formatos||!formatos.length)formatos=[unidad];
-      return{nombre:String(f[cProd]).trim(),unidad:formatos[0],area:String(f[cArea]).trim(),formatos};
+      const colorRaw=cColor?String(f[cColor]).trim():'';
+      const color=normColor(colorRaw)||null;
+      return{nombre:String(f[cProd]).trim(),unidad:formatos[0],area:String(f[cArea]).trim(),formatos,color};
     });
     if(reemplazar){const{error}=await sb.from('productos').update({activo:false}).eq('activo',true);if(error)throw error}
     for(let i=0;i<nuevos.length;i+=100){const{error}=await sb.from('productos').insert(nuevos.slice(i,i+100));if(error)throw error}
