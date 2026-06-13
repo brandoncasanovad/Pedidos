@@ -4,264 +4,249 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
 <title>Pedidos PDV</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root {
-  --azul: #185FA5; --azul-oscuro: #0C447C; --azul-claro: #E6F1FB;
-  --verde: #3B6D11; --verde-claro: #EAF3DE; --verde-texto: #27500A;
-  --rojo: #E24B4A; --rojo-claro: #FCEBEB; --rojo-texto: #791F1F;
-  --ambar: #EF9F27; --ambar-claro: #FAEEDA; --ambar-texto: #633806;
-  --gris-fondo: #f4f5f7; --gris-borde: #dfe3e8; --gris-texto: #5f6b76;
-  --texto: #1c2733; --blanco: #ffffff; --radio: 12px;
+  --azul:#185FA5;--azul-o:#0C447C;--azul-c:#E6F1FB;
+  --verde:#3B6D11;--verde-c:#EAF3DE;--verde-t:#27500A;
+  --rojo:#E24B4A;--rojo-c:#FCEBEB;--rojo-t:#791F1F;
+  --ambar:#EF9F27;--ambar-c:#FAEEDA;--ambar-t:#633806;
+  --fondo:#f4f5f7;--borde:#dfe3e8;--gris:#5f6b76;
+  --txt:#1c2733;--blanco:#fff;--r:12px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--gris-fondo); color: var(--texto); min-height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--fondo);color:var(--txt);min-height:100vh}
+.topbar{background:var(--blanco);border-bottom:1px solid var(--borde);position:sticky;top:0;z-index:50}
+.topbar-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;padding:0 12px}
+.brand{font-size:16px;font-weight:700;color:var(--azul);padding:14px 8px;white-space:nowrap}
+.tabs{display:flex;flex:1;justify-content:flex-end}
+.tab{padding:16px 12px;font-size:14px;font-weight:600;color:var(--gris);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:center;gap:5px}
+.tab.active{color:var(--azul);border-bottom-color:var(--azul)}
+.dot{background:var(--rojo);color:white;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
+.container{max-width:900px;margin:0 auto;padding:16px 12px 80px}
+.screen{display:none}.screen.active{display:block}
+h2{font-size:17px;font-weight:700;margin:18px 0 10px}h2:first-child{margin-top:0}
+.muted{color:var(--gris);font-size:13px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:10px 16px;border-radius:24px;border:1.5px solid var(--borde);background:var(--blanco);font-size:14px;font-weight:600;cursor:pointer;color:var(--gris)}
+.chip.active{background:var(--azul);border-color:var(--azul);color:white}
+.chip.area.active{background:var(--azul-c);border-color:var(--azul);color:var(--azul-o)}
+.card{background:var(--blanco);border:1px solid var(--borde);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.card-pad{padding:14px}
 
-.topbar { background: var(--blanco); border-bottom: 1px solid var(--gris-borde); position: sticky; top: 0; z-index: 50; }
-.topbar-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; padding: 0 12px; }
-.brand { font-size: 16px; font-weight: 700; color: var(--azul); padding: 14px 8px; white-space: nowrap; }
-.tabs { display: flex; flex: 1; justify-content: flex-end; }
-.tab { padding: 16px 14px; font-size: 14px; font-weight: 600; color: var(--gris-texto); border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; display: flex; align-items: center; gap: 6px; }
-.tab.active { color: var(--azul); border-bottom-color: var(--azul); }
-.tab .dot { background: var(--rojo); color: white; font-size: 11px; min-width: 18px; height: 18px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; }
+/* ---- fila de producto con formato ---- */
+.prow{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--fondo);flex-wrap:wrap}
+.prow:last-child{border-bottom:none}
+.pname{font-size:15px;flex:1;min-width:120px}
+.prow-ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.qty{display:flex;align-items:center;gap:6px}
+.qbtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--borde);background:var(--blanco);font-size:22px;cursor:pointer;color:var(--txt);line-height:1}
+.qbtn:active{background:var(--azul-c)}
+.qval{min-width:34px;text-align:center;font-size:17px;font-weight:700}
+.fmt-wrap{display:flex;align-items:center;gap:6px}
+.fmt-select{padding:8px 10px;border-radius:10px;border:1.5px solid var(--borde);font-size:14px;background:var(--blanco);color:var(--txt);max-width:130px}
+.fmt-libre{padding:8px 10px;border-radius:10px;border:1.5px solid var(--ambar);font-size:14px;background:var(--ambar-c);color:var(--txt);width:110px;display:none}
+.fmt-libre.show{display:block}
 
-.container { max-width: 900px; margin: 0 auto; padding: 16px 12px 80px; }
-.screen { display: none; }
-.screen.active { display: block; }
+.resumen{background:var(--azul-c);border-radius:var(--r);padding:14px;margin:14px 0}
+.rrow{display:flex;justify-content:space-between;font-size:14px;padding:3px 0}
+.rrow b{font-weight:700}.rarea{font-size:12px;font-weight:700;color:var(--azul-o);text-transform:uppercase;letter-spacing:.5px;margin:8px 0 2px}
+.rarea:first-child{margin-top:0}
+.btn{width:100%;padding:16px;border:none;border-radius:var(--r);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-azul{background:var(--azul);color:white}.btn-azul:disabled{background:#c3ccd4;cursor:not-allowed}
+.btn-verde{background:var(--verde);color:white}
+.btn-borde{background:var(--blanco);border:1.5px solid var(--borde);color:var(--txt)}
+.btn-sm{padding:10px 14px;font-size:14px;width:auto}
+.btn-rojo-b{background:var(--blanco);border:1.5px solid var(--rojo);color:var(--rojo-t)}
 
-h2 { font-size: 17px; font-weight: 700; margin: 18px 0 10px; }
-h2:first-child { margin-top: 0; }
-.muted { color: var(--gris-texto); font-size: 13px; }
+/* almacén */
+.phead{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
+.pavatar{width:42px;height:42px;border-radius:50%;background:var(--azul-c);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pinfo{flex:1;min-width:0}.ptitle{font-size:15px;font-weight:700}
+.pmeta{font-size:13px;color:var(--gris);margin-top:2px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pbody{padding:0 14px 14px;display:none}.pbody.open{display:block}
+.chev{color:#aab4bd;font-size:18px}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px}
+.b-az{background:var(--azul-c);color:var(--azul-o)}.b-v{background:var(--verde-c);color:var(--verde-t)}
+.b-r{background:var(--rojo-c);color:var(--rojo-t)}.b-am{background:var(--ambar-c);color:var(--ambar-t)}
 
-.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.chip { padding: 10px 16px; border-radius: 24px; border: 1.5px solid var(--gris-borde); background: var(--blanco); font-size: 14px; font-weight: 600; cursor: pointer; color: var(--gris-texto); }
-.chip.active { background: var(--azul); border-color: var(--azul); color: white; }
-.chip.area.active { background: var(--azul-claro); border-color: var(--azul); color: var(--azul-oscuro); }
+.irow{display:flex;align-items:center;gap:8px;padding:10px 8px;border-radius:8px;margin-bottom:4px;flex-wrap:wrap}
+.irow.st-red{background:var(--rojo-c)}.irow.st-amber{background:var(--ambar-c)}.irow.st-green{background:var(--verde-c)}
+.iname{flex:1;font-size:14px;min-width:100px}
+.ifmt{font-size:13px;font-weight:600;background:var(--fondo);border-radius:8px;padding:4px 10px;white-space:nowrap}
+.iqty{font-size:15px;font-weight:700;min-width:40px;text-align:center}
+.cbtns{display:flex;gap:6px}
+.cbtn{width:34px;height:34px;border-radius:50%;border:2.5px solid transparent;cursor:pointer}
+.cbtn.r{background:var(--rojo)}.cbtn.a{background:var(--ambar)}.cbtn.g{background:#639922}
+.cbtn.sel{border-color:var(--txt);transform:scale(1.12)}
+.acciones{display:flex;gap:10px;margin-top:12px}.acciones .btn{flex:1}
 
-.card { background: var(--blanco); border: 1px solid var(--gris-borde); border-radius: var(--radio); margin-bottom: 10px; overflow: hidden; }
-.card-pad { padding: 14px; }
+/* albaranes */
+.filtros{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+select,input[type=text],input[type=url]{padding:11px 12px;border-radius:10px;border:1.5px solid var(--borde);font-size:14px;background:var(--blanco);color:var(--txt)}
+.filtros select{flex:1;min-width:140px}
+.alb-doc{border:1.5px solid var(--borde);border-radius:10px;padding:16px;background:var(--blanco)}
+.alb-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--txt);padding-bottom:10px;margin-bottom:12px}
+.alb-num{font-family:ui-monospace,monospace;font-weight:700;color:var(--azul);font-size:14px}
+table.alb{width:100%;border-collapse:collapse;font-size:13px}
+table.alb th{text-align:left;padding:7px 8px;background:var(--fondo);font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--gris)}
+table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
+.pill{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.pl-g{background:#639922}.pl-a{background:var(--ambar)}.pl-r{background:var(--rojo)}
+.alb-area-row td{background:var(--fondo);font-weight:700;font-size:11px;text-transform:uppercase;color:var(--gris);padding:6px 8px}
+.empty{text-align:center;padding:50px 20px;color:var(--gris)}
+.empty .ico{font-size:40px;display:block;margin-bottom:10px}
 
-.prow { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--gris-fondo); }
-.prow:last-child { border-bottom: none; }
-.pname { flex: 1; font-size: 15px; }
-.punit { font-size: 12px; color: var(--gris-texto); min-width: 46px; }
-.qty { display: flex; align-items: center; gap: 8px; }
-.qbtn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gris-borde); background: var(--blanco); font-size: 22px; cursor: pointer; color: var(--texto); line-height: 1; }
-.qbtn:active { background: var(--azul-claro); }
-.qval { min-width: 36px; text-align: center; font-size: 17px; font-weight: 700; }
+/* ajustes */
+.cfg-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.cfg-row label{font-size:13px;font-weight:600;color:var(--gris)}
+.cfg-row input{width:100%}
+.lista-admin{margin-top:8px}
+.lrow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--fondo)}
+.lrow:last-child{border-bottom:none}.lrow .nom{flex:1;font-size:14px}
+.lrow .del{background:none;border:none;color:var(--rojo);font-size:18px;cursor:pointer;padding:6px}
+.add-row{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--fondo);flex-wrap:wrap}
+.add-row input,.add-row select{flex:1;min-width:80px}
 
-.resumen { background: var(--azul-claro); border-radius: var(--radio); padding: 14px; margin: 14px 0; }
-.rrow { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; }
-.rrow b { font-weight: 700; }
-.rarea { font-size: 12px; font-weight: 700; color: var(--azul-oscuro); text-transform: uppercase; letter-spacing: 0.5px; margin: 8px 0 2px; }
-.rarea:first-child { margin-top: 0; }
+/* formatos por producto en ajustes */
+.fmt-tag{display:inline-flex;align-items:center;gap:5px;background:var(--azul-c);color:var(--azul-o);border-radius:20px;padding:4px 10px;font-size:13px;font-weight:600;margin:2px}
+.fmt-tag button{background:none;border:none;cursor:pointer;color:var(--azul-o);font-size:15px;line-height:1;padding:0 2px}
+.fmt-add-row{display:flex;gap:6px;margin-top:6px}
+.fmt-add-row input{flex:1;min-width:0;padding:8px 10px;font-size:13px}
 
-.btn { width: 100%; padding: 16px; border: none; border-radius: var(--radio); font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-azul { background: var(--azul); color: white; }
-.btn-azul:disabled { background: #c3ccd4; cursor: not-allowed; }
-.btn-verde { background: var(--verde); color: white; }
-.btn-borde { background: var(--blanco); border: 1.5px solid var(--gris-borde); color: var(--texto); }
-.btn-sm { padding: 10px 14px; font-size: 14px; width: auto; }
-.btn-rojo-borde { background: var(--blanco); border: 1.5px solid var(--rojo); color: var(--rojo-texto); }
+.refresh-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.btn-refresh{background:var(--blanco);border:1.5px solid var(--borde);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--gris)}
+.leyenda{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+.ley{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gris)}
+.ley .d{width:11px;height:11px;border-radius:50%}
 
-.phead { display: flex; align-items: center; gap: 12px; padding: 14px; cursor: pointer; }
-.pavatar { width: 42px; height: 42px; border-radius: 50%; background: var(--azul-claro); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-.pinfo { flex: 1; min-width: 0; }
-.ptitle { font-size: 15px; font-weight: 700; }
-.pmeta { font-size: 13px; color: var(--gris-texto); margin-top: 2px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-.pbody { padding: 0 14px 14px; display: none; }
-.pbody.open { display: block; }
-.chev { color: #aab4bd; font-size: 18px; }
-
-.badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 12px; }
-.b-azul { background: var(--azul-claro); color: var(--azul-oscuro); }
-.b-verde { background: var(--verde-claro); color: var(--verde-texto); }
-.b-rojo { background: var(--rojo-claro); color: var(--rojo-texto); }
-.b-ambar { background: var(--ambar-claro); color: var(--ambar-texto); }
-
-.irow { display: flex; align-items: center; gap: 8px; padding: 10px 8px; border-radius: 8px; margin-bottom: 4px; }
-.irow.st-red { background: var(--rojo-claro); }
-.irow.st-amber { background: var(--ambar-claro); }
-.irow.st-green { background: var(--verde-claro); }
-.iname { flex: 1; font-size: 14px; }
-.iqty { font-size: 14px; font-weight: 600; min-width: 70px; text-align: center; }
-.cbtns { display: flex; gap: 6px; }
-.cbtn { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid transparent; cursor: pointer; }
-.cbtn.r { background: var(--rojo); } .cbtn.a { background: var(--ambar); } .cbtn.g { background: #639922; }
-.cbtn.sel { border-color: var(--texto); transform: scale(1.12); }
-
-.acciones { display: flex; gap: 10px; margin-top: 12px; }
-.acciones .btn { flex: 1; }
-
-.filtros { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-select, input[type=text], input[type=url] { padding: 11px 12px; border-radius: 10px; border: 1.5px solid var(--gris-borde); font-size: 14px; background: var(--blanco); color: var(--texto); }
-.filtros select { flex: 1; min-width: 140px; }
-
-.alb-doc { border: 1.5px solid var(--gris-borde); border-radius: 10px; padding: 16px; background: var(--blanco); }
-.alb-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--texto); padding-bottom: 10px; margin-bottom: 12px; }
-.alb-num { font-family: ui-monospace, monospace; font-weight: 700; color: var(--azul); font-size: 14px; }
-table.alb { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.alb th { text-align: left; padding: 7px 8px; background: var(--gris-fondo); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--gris-texto); }
-table.alb td { padding: 8px; border-bottom: 1px solid var(--gris-fondo); }
-.pill { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
-.pl-g { background: #639922; } .pl-a { background: var(--ambar); } .pl-r { background: var(--rojo); }
-.alb-area-row td { background: var(--gris-fondo); font-weight: 700; font-size: 11px; text-transform: uppercase; color: var(--gris-texto); padding: 6px 8px; }
-
-.empty { text-align: center; padding: 50px 20px; color: var(--gris-texto); }
-.empty .ico { font-size: 40px; display: block; margin-bottom: 10px; }
-
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--texto); color: white; padding: 13px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 200; transition: transform 0.3s; max-width: 90vw; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.error { background: var(--rojo-texto); }
-
-.cfg-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
-.cfg-row label { font-size: 13px; font-weight: 600; color: var(--gris-texto); }
-.cfg-row input { width: 100%; }
-.lista-admin { margin-top: 8px; }
-.lrow { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--gris-fondo); }
-.lrow:last-child { border-bottom: none; }
-.lrow .nom { flex: 1; font-size: 14px; }
-.lrow .del { background: none; border: none; color: var(--rojo); font-size: 18px; cursor: pointer; padding: 6px; }
-.add-row { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--gris-fondo); }
-.add-row input, .add-row select { flex: 1; min-width: 0; }
-.add-row button { white-space: nowrap; }
-
-.refresh-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.btn-refresh { background: var(--blanco); border: 1.5px solid var(--gris-borde); border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--gris-texto); }
-
-.leyenda { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
-.ley { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gris-texto); }
-.ley .d { width: 11px; height: 11px; border-radius: 50%; }
-
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
-.overlay.show { display: flex; }
-.modal { background: var(--blanco); border-radius: 16px; padding: 22px; max-width: 440px; width: 100%; max-height: 85vh; overflow-y: auto; }
-.modal h3 { font-size: 17px; margin-bottom: 14px; }
-
-.loader { display: inline-block; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-@media (min-width: 700px) {
-  .tab { padding: 16px 20px; font-size: 15px; }
-}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.show{display:flex}
+.modal{background:var(--blanco);border-radius:16px;padding:22px;max-width:440px;width:100%;max-height:85vh;overflow-y:auto}
+.modal h3{font-size:17px;margin-bottom:14px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--txt);color:white;padding:13px 22px;border-radius:12px;font-size:14px;font-weight:600;z-index:200;transition:transform .3s;max-width:90vw}
+.toast.show{transform:translateX(-50%) translateY(0)}.toast.error{background:var(--rojo-t)}
+.loader{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">📋 Pedidos PDV</div>
-    <div class="tabs">
-      <button class="tab active" data-t="0" onclick="goTab(0)">🛒 Pedidos</button>
-      <button class="tab" data-t="1" onclick="goTab(1)">📦 Almacén <span class="dot" id="dot-alm" style="display:none">0</span></button>
-      <button class="tab" data-t="2" onclick="goTab(2)">📄 Albaranes</button>
-      <button class="tab" data-t="3" onclick="goTab(3)">⚙️</button>
-    </div>
+<div class="topbar"><div class="topbar-inner">
+  <div class="brand">📋 Pedidos PDV</div>
+  <div class="tabs">
+    <button class="tab active" data-t="0" onclick="goTab(0)">🛒 Pedidos</button>
+    <button class="tab" data-t="1" onclick="goTab(1)">📦 Almacén <span class="dot" id="dot-alm" style="display:none">0</span></button>
+    <button class="tab" data-t="2" onclick="goTab(2)">📄 Albaranes</button>
+    <button class="tab" data-t="3" onclick="goTab(3)">⚙️</button>
   </div>
-</div>
+</div></div>
 
 <div class="container">
 
-  <!-- ============ PANTALLA 0: REALIZAR PEDIDOS ============ -->
-  <div class="screen active" id="s0">
-    <h2>Punto de venta</h2>
-    <div class="chips" id="pv-chips"></div>
-    <h2>Área</h2>
-    <div class="chips" id="area-chips"></div>
-    <div class="card" id="prod-card"><div class="empty" id="prod-empty">Cargando productos…</div><div id="prod-list"></div></div>
-    <div class="resumen" id="resumen" style="display:none"></div>
-    <button class="btn btn-azul" id="btn-enviar" onclick="enviarPedido()" disabled>📤 Enviar pedido a almacén</button>
+<!-- ===== PANTALLA 0: PEDIDOS ===== -->
+<div class="screen active" id="s0">
+  <h2>Punto de venta</h2>
+  <div class="chips" id="pv-chips"></div>
+  <h2>Área</h2>
+  <div class="chips" id="area-chips"></div>
+  <div class="card" id="prod-card">
+    <div class="empty" id="prod-empty">Cargando…</div>
+    <div id="prod-list"></div>
+  </div>
+  <div class="resumen" id="resumen" style="display:none"></div>
+  <button class="btn btn-azul" id="btn-enviar" onclick="enviarPedido()" disabled>📤 Enviar pedido a almacén</button>
+</div>
+
+<!-- ===== PANTALLA 1: ALMACÉN ===== -->
+<div class="screen" id="s1">
+  <div class="refresh-bar">
+    <h2 style="margin:0">Pedidos pendientes</h2>
+    <button class="btn-refresh" onclick="cargarPedidos(true)">🔄 Actualizar</button>
+  </div>
+  <div class="leyenda">
+    <div class="ley"><div class="d" style="background:var(--rojo)"></div> Sin stock</div>
+    <div class="ley"><div class="d" style="background:var(--ambar)"></div> Parcial</div>
+    <div class="ley"><div class="d" style="background:#639922"></div> Completo</div>
+  </div>
+  <div id="lista-pedidos"></div>
+</div>
+
+<!-- ===== PANTALLA 2: ALBARANES ===== -->
+<div class="screen" id="s2">
+  <div class="refresh-bar">
+    <h2 style="margin:0">Histórico de albaranes</h2>
+    <button class="btn-refresh" onclick="cargarAlbaranes(true)">🔄 Actualizar</button>
+  </div>
+  <div class="filtros">
+    <select id="f-pv" onchange="renderAlbaranes()"><option value="">Todos los puntos de venta</option></select>
+    <select id="f-est" onchange="renderAlbaranes()">
+      <option value="">Todos los estados</option>
+      <option value="completo">Completo</option>
+      <option value="parcial">Parcial</option>
+      <option value="incidencias">Con incidencias</option>
+    </select>
+  </div>
+  <div id="lista-albaranes"></div>
+</div>
+
+<!-- ===== PANTALLA 3: AJUSTES ===== -->
+<div class="screen" id="s3">
+  <h2>Conexión a la base de datos</h2>
+  <div class="card card-pad">
+    <div class="cfg-row"><label>URL del proyecto Supabase</label><input type="url" id="cfg-url" placeholder="https://xxxxx.supabase.co"></div>
+    <div class="cfg-row"><label>Clave anon (public)</label><input type="text" id="cfg-key" placeholder="eyJhbGciOi..."></div>
+    <button class="btn btn-azul" onclick="guardarConexion()">💾 Guardar y conectar</button>
+    <p class="muted" style="margin-top:10px" id="cfg-estado">Sin conectar</p>
   </div>
 
-  <!-- ============ PANTALLA 1: ALMACÉN ============ -->
-  <div class="screen" id="s1">
-    <div class="refresh-bar">
-      <h2 style="margin:0">Pedidos pendientes</h2>
-      <button class="btn-refresh" onclick="cargarPedidos(true)">🔄 Actualizar</button>
+  <h2>Puntos de venta</h2>
+  <div class="card">
+    <div class="lista-admin" id="admin-pvs"></div>
+    <div class="add-row">
+      <input type="text" id="nuevo-pv" placeholder="Nombre del nuevo punto de venta">
+      <button class="btn btn-azul btn-sm" onclick="agregarPV()">+ Añadir</button>
     </div>
-    <div class="leyenda">
-      <div class="ley"><div class="d" style="background:var(--rojo)"></div> Sin stock</div>
-      <div class="ley"><div class="d" style="background:var(--ambar)"></div> Parcial</div>
-      <div class="ley"><div class="d" style="background:#639922"></div> Completo</div>
-    </div>
-    <div id="lista-pedidos"></div>
   </div>
 
-  <!-- ============ PANTALLA 2: ALBARANES ============ -->
-  <div class="screen" id="s2">
-    <div class="refresh-bar">
-      <h2 style="margin:0">Histórico de albaranes</h2>
-      <button class="btn-refresh" onclick="cargarAlbaranes(true)">🔄 Actualizar</button>
+  <h2>Áreas</h2>
+  <div class="card">
+    <div class="lista-admin" id="admin-areas"></div>
+    <div class="add-row">
+      <input type="text" id="nueva-area" placeholder="Nombre de la nueva área">
+      <button class="btn btn-azul btn-sm" onclick="agregarArea()">+ Añadir</button>
     </div>
-    <div class="filtros">
-      <select id="f-pv" onchange="renderAlbaranes()"><option value="">Todos los puntos de venta</option></select>
-      <select id="f-est" onchange="renderAlbaranes()">
-        <option value="">Todos los estados</option>
-        <option value="completo">Completo</option>
-        <option value="parcial">Parcial</option>
-        <option value="incidencias">Con incidencias</option>
-      </select>
-    </div>
-    <div id="lista-albaranes"></div>
   </div>
 
-  <!-- ============ PANTALLA 3: AJUSTES ============ -->
-  <div class="screen" id="s3">
-    <h2>Conexión a la base de datos</h2>
-    <div class="card card-pad">
-      <div class="cfg-row"><label>URL del proyecto Supabase</label><input type="url" id="cfg-url" placeholder="https://xxxxx.supabase.co"></div>
-      <div class="cfg-row"><label>Clave anon (public)</label><input type="text" id="cfg-key" placeholder="eyJhbGciOi..."></div>
-      <button class="btn btn-azul" onclick="guardarConexion()">💾 Guardar y conectar</button>
-      <p class="muted" style="margin-top:10px" id="cfg-estado">Sin conectar</p>
+  <h2>Catálogo de productos</h2>
+  <div class="card card-pad">
+    <p class="muted" style="margin-bottom:12px">El Excel debe tener columnas: <b>Producto, Unidad, Area, Formatos</b> (la columna Formatos es opcional; escribe los formatos separados por comas: <i>Unidad, Caja 6ud, Garrafa</i>).</p>
+    <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(event)">
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-borde btn-sm" onclick="document.getElementById('excel-input').click()">📥 Importar Excel (añadir)</button>
+      <button class="btn btn-rojo-b btn-sm" onclick="reemplazarCatalogo()">🔄 Importar Excel (reemplazar)</button>
     </div>
-
-    <h2>Puntos de venta</h2>
-    <div class="card">
-      <div class="lista-admin" id="admin-pvs"></div>
-      <div class="add-row">
-        <input type="text" id="nuevo-pv" placeholder="Nombre del nuevo punto de venta">
-        <button class="btn btn-azul btn-sm" onclick="agregarPV()">+ Añadir</button>
-      </div>
-    </div>
-
-    <h2>Áreas</h2>
-    <div class="card">
-      <div class="lista-admin" id="admin-areas"></div>
-      <div class="add-row">
-        <input type="text" id="nueva-area" placeholder="Nombre de la nueva área">
-        <button class="btn btn-azul btn-sm" onclick="agregarArea()">+ Añadir</button>
-      </div>
-    </div>
-
-    <h2>Catálogo de productos</h2>
-    <div class="card card-pad">
-      <p class="muted" style="margin-bottom:12px">Importa tu base de datos Excel. El archivo debe tener las columnas: <b>Producto</b>, <b>Unidad</b>, <b>Area</b> (primera hoja, primera fila como encabezados).</p>
-      <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(event)">
-      <div style="display:flex; gap:10px; flex-wrap:wrap">
-        <button class="btn btn-borde btn-sm" onclick="document.getElementById('excel-input').click()">📥 Importar Excel (añadir)</button>
-        <button class="btn btn-rojo-borde btn-sm" onclick="reemplazarCatalogo()">🔄 Importar Excel (reemplazar todo)</button>
-      </div>
-      <p class="muted" style="margin-top:10px" id="prod-count"></p>
-    </div>
-    <div class="card">
-      <div class="lista-admin" id="admin-prods"></div>
-      <div class="add-row">
-        <input type="text" id="np-nombre" placeholder="Producto" style="flex:2">
-        <input type="text" id="np-unidad" placeholder="Ud." style="flex:0.7; min-width:60px">
-        <select id="np-area" style="flex:1"></select>
-        <button class="btn btn-azul btn-sm" onclick="agregarProducto()">+</button>
-      </div>
+    <p class="muted" style="margin-top:10px" id="prod-count"></p>
+  </div>
+  <div class="card" id="admin-prods-card">
+    <div class="lista-admin" id="admin-prods"></div>
+    <div class="add-row">
+      <input type="text" id="np-nombre" placeholder="Producto" style="flex:2">
+      <input type="text" id="np-unidad" placeholder="Ud. base" style="flex:0.8;min-width:70px">
+      <select id="np-area" style="flex:1;min-width:100px"></select>
+      <button class="btn btn-azul btn-sm" onclick="agregarProducto()">+</button>
     </div>
   </div>
 </div>
+</div><!-- /container -->
 
+<!-- Modal conexión inicial -->
 <div class="overlay" id="overlay-conexion">
   <div class="modal">
-    <h3>👋 Bienvenido — Configuración inicial</h3>
-    <p class="muted" style="margin-bottom:14px">Introduce los datos de tu proyecto Supabase para conectar la app. Solo hay que hacerlo una vez por dispositivo.</p>
+    <h3>👋 Configuración inicial</h3>
+    <p class="muted" style="margin-bottom:14px">Introduce los datos de tu proyecto Supabase. Solo hay que hacerlo una vez por dispositivo.</p>
     <div class="cfg-row"><label>URL del proyecto</label><input type="url" id="m-url" placeholder="https://xxxxx.supabase.co"></div>
     <div class="cfg-row"><label>Clave anon (public)</label><input type="text" id="m-key" placeholder="eyJhbGciOi..."></div>
     <button class="btn btn-azul" onclick="conectarDesdeModal()">Conectar</button>
@@ -271,186 +256,215 @@ table.alb td { padding: 8px; border-bottom: 1px solid var(--gris-fondo); }
 <div class="toast" id="toast"></div>
 
 <script>
-let sb = null;
-let DB = { pvs: [], areas: [], productos: [], pedidos: [], albaranes: [] };
-let UI = { pv: null, area: null, cant: {}, abiertos: new Set(), albAbiertos: new Set(), modoReemplazo: false };
-let pollTimer = null;
+let sb=null;
+let DB={pvs:[],areas:[],productos:[],pedidos:[],albaranes:[]};
+let UI={pv:null,area:null,cant:{},fmt:{},fmtLibre:{},abiertos:new Set(),albAbiertos:new Set(),modoReemplazo:false};
+let pollTimer=null;
 
-// ---------- UTILIDADES ----------
-function $(id) { return document.getElementById(id); }
-function toast(msg, esError) {
-  const t = $('toast'); t.textContent = msg;
-  t.classList.toggle('error', !!esError); t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
-}
-function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fechaES(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('es-ES', {day:'2-digit',month:'2-digit',year:'numeric'}) + ' · ' + d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-}
+const FORMATOS_DEFAULT=['Unidad','Caja','Saco','Palet','Bolsa','Botella','Garrafa','Paquete','Rollo','Barril'];
+
+function $(id){return document.getElementById(id)}
+function toast(msg,err){const t=$('toast');t.textContent=msg;t.classList.toggle('error',!!err);t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fechaES(iso){const d=new Date(iso);return d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'})+' · '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}
 
 // ---------- CONEXIÓN ----------
-function initConexion() {
-  const url = localStorage.getItem('sb_url'), key = localStorage.getItem('sb_key');
-  if (url && key) {
-    sb = supabase.createClient(url, key);
-    $('cfg-url').value = url; $('cfg-key').value = key;
-    $('cfg-estado').textContent = '✅ Conectado a ' + url;
-    cargarTodo();
-  } else {
-    $('overlay-conexion').classList.add('show');
-  }
+function initConexion(){
+  const url=localStorage.getItem('sb_url'),key=localStorage.getItem('sb_key');
+  if(url&&key){sb=supabase.createClient(url,key);$('cfg-url').value=url;$('cfg-key').value=key;$('cfg-estado').textContent='✅ Conectado a '+url;cargarTodo()}
+  else{$('overlay-conexion').classList.add('show')}
 }
-function conectar(url, key) {
-  if (!url || !key) { toast('Completa la URL y la clave', true); return; }
-  localStorage.setItem('sb_url', url.trim()); localStorage.setItem('sb_key', key.trim());
-  sb = supabase.createClient(url.trim(), key.trim());
+function conectar(url,key){
+  if(!url||!key){toast('Completa URL y clave',true);return}
+  localStorage.setItem('sb_url',url.trim());localStorage.setItem('sb_key',key.trim());
+  sb=supabase.createClient(url.trim(),key.trim());
   $('overlay-conexion').classList.remove('show');
-  $('cfg-url').value = url.trim(); $('cfg-key').value = key.trim();
-  $('cfg-estado').textContent = '✅ Conectado a ' + url.trim();
-  toast('Conectado correctamente');
-  cargarTodo();
+  $('cfg-url').value=url.trim();$('cfg-key').value=key.trim();
+  $('cfg-estado').textContent='✅ Conectado a '+url.trim();
+  toast('Conectado correctamente');cargarTodo();
 }
-function conectarDesdeModal() { conectar($('m-url').value, $('m-key').value); }
-function guardarConexion() { conectar($('cfg-url').value, $('cfg-key').value); }
+function conectarDesdeModal(){conectar($('m-url').value,$('m-key').value)}
+function guardarConexion(){conectar($('cfg-url').value,$('cfg-key').value)}
 
-// ---------- CARGA DE DATOS ----------
-async function cargarTodo() {
-  await Promise.all([cargarCatalogo(), cargarPedidos(), cargarAlbaranes()]);
-}
-async function cargarCatalogo() {
-  if (!sb) return;
-  try {
-    const [pvs, areas, prods] = await Promise.all([
-      sb.from('puntos_venta').select('*').eq('activo', true).order('nombre'),
+// ---------- CARGA ----------
+async function cargarTodo(){await Promise.all([cargarCatalogo(),cargarPedidos(),cargarAlbaranes()])}
+async function cargarCatalogo(){
+  if(!sb)return;
+  try{
+    const[pvs,areas,prods]=await Promise.all([
+      sb.from('puntos_venta').select('*').eq('activo',true).order('nombre'),
       sb.from('areas').select('*').order('nombre'),
-      sb.from('productos').select('*').eq('activo', true).order('nombre'),
+      sb.from('productos').select('*').eq('activo',true).order('nombre'),
     ]);
-    if (pvs.error || areas.error || prods.error) throw (pvs.error || areas.error || prods.error);
-    DB.pvs = pvs.data; DB.areas = areas.data; DB.productos = prods.data;
-    if (!UI.pv && DB.pvs.length) UI.pv = DB.pvs[0].id;
-    if (!UI.area && DB.areas.length) UI.area = DB.areas[0].nombre;
-    renderPedidoUI(); renderAdmin();
-  } catch (e) { toast('Error cargando datos: ' + (e.message || e), true); }
+    if(pvs.error||areas.error||prods.error)throw(pvs.error||areas.error||prods.error);
+    DB.pvs=pvs.data;DB.areas=areas.data;DB.productos=prods.data;
+    if(!UI.pv&&DB.pvs.length)UI.pv=DB.pvs[0].id;
+    if(!UI.area&&DB.areas.length)UI.area=DB.areas[0].nombre;
+    renderPedidoUI();renderAdmin();
+  }catch(e){toast('Error cargando: '+(e.message||e),true)}
 }
-async function cargarPedidos(manual) {
-  if (!sb) return;
-  try {
-    const { data, error } = await sb.from('pedidos').select('*').eq('estado', 'pendiente').order('creado', { ascending: true });
-    if (error) throw error;
-    DB.pedidos = data;
-    renderAlmacen();
-    if (manual) toast('Pedidos actualizados');
-  } catch (e) { if (manual) toast('Error: ' + (e.message || e), true); }
+async function cargarPedidos(manual){
+  if(!sb)return;
+  try{
+    const{data,error}=await sb.from('pedidos').select('*').eq('estado','pendiente').order('creado',{ascending:true});
+    if(error)throw error;
+    DB.pedidos=data;renderAlmacen();
+    if(manual)toast('Pedidos actualizados');
+  }catch(e){if(manual)toast('Error: '+(e.message||e),true)}
 }
-async function cargarAlbaranes(manual) {
-  if (!sb) return;
-  try {
-    const { data, error } = await sb.from('albaranes').select('*').order('creado', { ascending: false }).limit(200);
-    if (error) throw error;
-    DB.albaranes = data;
-    renderAlbaranes();
-    if (manual) toast('Albaranes actualizados');
-  } catch (e) { if (manual) toast('Error: ' + (e.message || e), true); }
+async function cargarAlbaranes(manual){
+  if(!sb)return;
+  try{
+    const{data,error}=await sb.from('albaranes').select('*').order('creado',{ascending:false}).limit(200);
+    if(error)throw error;
+    DB.albaranes=data;renderAlbaranes();
+    if(manual)toast('Albaranes actualizados');
+  }catch(e){if(manual)toast('Error: '+(e.message||e),true)}
 }
 
-// ---------- NAVEGACIÓN ----------
-function goTab(n) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.t == n));
-  document.querySelectorAll('.screen').forEach((s, i) => s.classList.toggle('active', i === n));
+// ---------- NAV ----------
+function goTab(n){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.t==n));
+  document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n));
   clearInterval(pollTimer);
-  if (n === 1) { cargarPedidos(); pollTimer = setInterval(cargarPedidos, 20000); }
-  if (n === 2) { cargarAlbaranes(); pollTimer = setInterval(cargarAlbaranes, 30000); }
-  if (n === 0) cargarCatalogo();
+  if(n===1){cargarPedidos();pollTimer=setInterval(cargarPedidos,20000)}
+  if(n===2){cargarAlbaranes();pollTimer=setInterval(cargarAlbaranes,30000)}
+  if(n===0)cargarCatalogo();
 }
 
 // ---------- PANTALLA PEDIDOS ----------
-function renderPedidoUI() {
-  $('pv-chips').innerHTML = DB.pvs.map(pv =>
-    `<button class="chip ${pv.id === UI.pv ? 'active' : ''}" onclick="UI.pv='${pv.id}';renderPedidoUI()">${esc(pv.nombre)}</button>`
-  ).join('') || '<p class="muted">Añade un punto de venta en Ajustes ⚙️</p>';
+function getFormatos(prod){
+  // formatos guardados en la BD (array) o FORMATOS_DEFAULT
+  if(prod.formatos&&prod.formatos.length)return prod.formatos;
+  return FORMATOS_DEFAULT;
+}
 
-  $('area-chips').innerHTML = DB.areas.map(a =>
-    `<button class="chip area ${a.nombre === UI.area ? 'active' : ''}" onclick="UI.area='${esc(a.nombre)}';renderPedidoUI()">${esc(a.nombre)}</button>`
-  ).join('') || '<p class="muted">Añade áreas en Ajustes ⚙️</p>';
+function renderPedidoUI(){
+  $('pv-chips').innerHTML=DB.pvs.map(pv=>
+    `<button class="chip ${pv.id===UI.pv?'active':''}" onclick="UI.pv='${pv.id}';renderPedidoUI()">${esc(pv.nombre)}</button>`
+  ).join('')||'<p class="muted">Añade un punto de venta en ⚙️ Ajustes</p>';
 
-  const prods = DB.productos.filter(p => p.area === UI.area);
-  $('prod-empty').style.display = prods.length ? 'none' : 'block';
-  $('prod-empty').textContent = DB.productos.length ? 'No hay productos en esta área' : 'No hay productos. Importa tu Excel en Ajustes ⚙️';
-  $('prod-list').innerHTML = prods.map(p => {
-    const k = UI.pv + '|' + p.id, q = UI.cant[k] || 0;
+  $('area-chips').innerHTML=DB.areas.map(a=>
+    `<button class="chip area ${a.nombre===UI.area?'active':''}" onclick="UI.area='${esc(a.nombre)}';renderPedidoUI()">${esc(a.nombre)}</button>`
+  ).join('')||'<p class="muted">Añade áreas en ⚙️ Ajustes</p>';
+
+  const prods=DB.productos.filter(p=>p.area===UI.area);
+  $('prod-empty').style.display=prods.length?'none':'block';
+  $('prod-empty').textContent=DB.productos.length?'No hay productos en esta área':'Importa tu catálogo en ⚙️ Ajustes';
+
+  $('prod-list').innerHTML=prods.map(p=>{
+    const k=UI.pv+'|'+p.id;
+    const q=UI.cant[k]||0;
+    const fmts=getFormatos(p);
+    const fmtActual=UI.fmt[k]||fmts[0];
+    const isLibre=fmtActual==='__libre__'||!fmts.includes(fmtActual)&&fmtActual!==fmts[0];
+    const selVal=isLibre?'__libre__':fmtActual;
+
+    const options=fmts.map(f=>`<option value="${esc(f)}" ${selVal===f?'selected':''}>${esc(f)}</option>`).join('');
+
     return `<div class="prow">
-      <span class="pname">${esc(p.nombre)}</span><span class="punit">${esc(p.unidad)}</span>
-      <div class="qty">
-        <button class="qbtn" onclick="camb('${k}',-1)">−</button>
-        <span class="qval" id="q_${k}">${q}</span>
-        <button class="qbtn" onclick="camb('${k}',1)">+</button>
-      </div></div>`;
+      <span class="pname">${esc(p.nombre)}</span>
+      <div class="prow-ctrl">
+        <div class="fmt-wrap">
+          <select class="fmt-select" id="fs_${k}" onchange="cambFmt('${k}',this.value,'${esc(p.id)}')">
+            ${options}
+            <option value="__libre__" ${selVal==='__libre__'?'selected':''}>✏️ Otro…</option>
+          </select>
+          <input class="fmt-libre ${isLibre?'show':''}" id="fl_${k}" type="text" placeholder="Escribe formato" value="${isLibre?esc(UI.fmtLibre[k]||''):''}" oninput="UI.fmtLibre['${k}']=this.value;renderResumen()">
+        </div>
+        <div class="qty">
+          <button class="qbtn" onclick="camb('${k}',-1)">−</button>
+          <span class="qval" id="q_${k}">${q}</span>
+          <button class="qbtn" onclick="camb('${k}',1)">+</button>
+        </div>
+      </div>
+    </div>`;
   }).join('');
   renderResumen();
 }
-function camb(k, d) {
-  UI.cant[k] = Math.max(0, (UI.cant[k] || 0) + d);
-  const el = $('q_' + k); if (el) el.textContent = UI.cant[k];
+
+function cambFmt(k,val){
+  UI.fmt[k]=val;
+  const libre=$('fl_'+k);
+  if(libre){libre.classList.toggle('show',val==='__libre__')}
   renderResumen();
 }
-function itemsCarrito() {
-  const out = [];
-  for (const [k, q] of Object.entries(UI.cant)) {
-    if (q <= 0) continue;
-    const [pvId, prodId] = k.split('|');
-    if (pvId !== UI.pv) continue;
-    const p = DB.productos.find(x => x.id === prodId);
-    if (p) out.push({ producto_id: p.id, nombre: p.nombre, unidad: p.unidad, area: p.area, cantidad: q, color: null });
+function camb(k,d){
+  UI.cant[k]=Math.max(0,(UI.cant[k]||0)+d);
+  const el=$('q_'+k);if(el)el.textContent=UI.cant[k];
+  renderResumen();
+}
+
+function getFmtLabel(k){
+  const val=UI.fmt[k];
+  if(!val||val===UI.fmt[k]){
+    // default: primer formato del producto
+  }
+  if(val==='__libre__')return(UI.fmtLibre[k]||'').trim()||'?';
+  return val||FORMATOS_DEFAULT[0];
+}
+
+function itemsCarrito(){
+  const out=[];
+  for(const[k,q]of Object.entries(UI.cant)){
+    if(q<=0)continue;
+    const[pvId,prodId]=k.split('|');
+    if(pvId!==UI.pv)continue;
+    const p=DB.productos.find(x=>x.id===prodId);
+    if(!p)continue;
+    const fmts=getFormatos(p);
+    const fmtVal=UI.fmt[k]||fmts[0];
+    const fmt=fmtVal==='__libre__'?(UI.fmtLibre[k]||'').trim()||fmts[0]:fmtVal;
+    out.push({producto_id:p.id,nombre:p.nombre,unidad:p.unidad,area:p.area,cantidad:q,formato:fmt,color:null});
   }
   return out;
 }
-function renderResumen() {
-  const items = itemsCarrito(), r = $('resumen'), b = $('btn-enviar');
-  if (!items.length) { r.style.display = 'none'; b.disabled = true; return; }
-  r.style.display = 'block'; b.disabled = false;
-  const porArea = {};
-  items.forEach(i => { (porArea[i.area] = porArea[i.area] || []).push(i); });
-  r.innerHTML = Object.entries(porArea).map(([a, its]) =>
-    `<div class="rarea">${esc(a)}</div>` + its.map(i => `<div class="rrow"><span>${esc(i.nombre)}</span><b>${i.cantidad} ${esc(i.unidad)}</b></div>`).join('')
+
+function renderResumen(){
+  const items=itemsCarrito(),r=$('resumen'),b=$('btn-enviar');
+  if(!items.length){r.style.display='none';b.disabled=true;return}
+  r.style.display='block';b.disabled=false;
+  const porArea={};
+  items.forEach(i=>{(porArea[i.area]=porArea[i.area]||[]).push(i)});
+  r.innerHTML=Object.entries(porArea).map(([a,its])=>
+    `<div class="rarea">${esc(a)}</div>`+its.map(i=>`<div class="rrow"><span>${esc(i.nombre)}</span><b>${i.cantidad} × ${esc(i.formato)}</b></div>`).join('')
   ).join('');
 }
-async function enviarPedido() {
-  const items = itemsCarrito();
-  if (!items.length || !sb) return;
-  const pv = DB.pvs.find(p => p.id === UI.pv);
-  const b = $('btn-enviar'); b.disabled = true; b.innerHTML = '<span class="loader"></span> Enviando…';
-  try {
-    const { error } = await sb.from('pedidos').insert({ pv_id: pv.id, pv_nombre: pv.nombre, items, estado: 'pendiente' });
-    if (error) throw error;
-    items.forEach(i => { UI.cant[UI.pv + '|' + i.producto_id] = 0; });
-    renderPedidoUI();
-    toast('✅ Pedido enviado a almacén');
-  } catch (e) { toast('Error al enviar: ' + (e.message || e), true); }
-  b.innerHTML = '📤 Enviar pedido a almacén';
+
+async function enviarPedido(){
+  const items=itemsCarrito();
+  if(!items.length||!sb)return;
+  const pv=DB.pvs.find(p=>p.id===UI.pv);
+  const b=$('btn-enviar');b.disabled=true;b.innerHTML='<span class="loader"></span> Enviando…';
+  try{
+    const{error}=await sb.from('pedidos').insert({pv_id:pv.id,pv_nombre:pv.nombre,items,estado:'pendiente'});
+    if(error)throw error;
+    items.forEach(i=>{UI.cant[UI.pv+'|'+i.producto_id]=0;});
+    renderPedidoUI();toast('✅ Pedido enviado a almacén');
+  }catch(e){toast('Error al enviar: '+(e.message||e),true)}
+  b.innerHTML='📤 Enviar pedido a almacén';
 }
 
-// ---------- PANTALLA ALMACÉN ----------
-function renderAlmacen() {
-  const dot = $('dot-alm');
-  dot.style.display = DB.pedidos.length ? 'inline-flex' : 'none';
-  dot.textContent = DB.pedidos.length;
-  const L = $('lista-pedidos');
-  if (!DB.pedidos.length) {
-    L.innerHTML = '<div class="empty"><span class="ico">📭</span>No hay pedidos pendientes</div>'; return;
-  }
-  L.innerHTML = DB.pedidos.map(p => {
-    const open = UI.abiertos.has(p.id);
-    const n = { red: 0, amber: 0, green: 0 };
-    p.items.forEach(i => { if (i.color) n[i.color]++; });
-    let badges = `<span class="badge b-azul">${p.items.length} art.</span>`;
-    if (n.red) badges += ` <span class="badge b-rojo">${n.red} sin stock</span>`;
-    if (n.amber) badges += ` <span class="badge b-ambar">${n.amber} parcial</span>`;
-    if (n.green) badges += ` <span class="badge b-verde">${n.green} ok</span>`;
-    const rows = p.items.map((it, ix) => `
-      <div class="irow ${it.color ? 'st-' + it.color : ''}">
+// ---------- ALMACÉN ----------
+function renderAlmacen(){
+  const dot=$('dot-alm');
+  dot.style.display=DB.pedidos.length?'inline-flex':'none';
+  dot.textContent=DB.pedidos.length;
+  const L=$('lista-pedidos');
+  if(!DB.pedidos.length){L.innerHTML='<div class="empty"><span class="ico">📭</span>No hay pedidos pendientes</div>';return}
+  L.innerHTML=DB.pedidos.map(p=>{
+    const open=UI.abiertos.has(p.id);
+    const n={red:0,amber:0,green:0};
+    p.items.forEach(i=>{if(i.color)n[i.color]++});
+    let badges=`<span class="badge b-az">${p.items.length} art.</span>`;
+    if(n.red)badges+=` <span class="badge b-r">${n.red} sin stock</span>`;
+    if(n.amber)badges+=` <span class="badge b-am">${n.amber} parcial</span>`;
+    if(n.green)badges+=` <span class="badge b-v">${n.green} ok</span>`;
+    const rows=p.items.map((it,ix)=>`
+      <div class="irow ${it.color?'st-'+it.color:''}">
         <span class="iname">${esc(it.nombre)} <span class="muted">· ${esc(it.area)}</span></span>
-        <span class="iqty">${it.cantidad} ${esc(it.unidad)}</span>
+        <span class="ifmt">📦 ${esc(it.formato||it.unidad||'ud')}</span>
+        <span class="iqty">${it.cantidad}</span>
         <div class="cbtns">
           <button class="cbtn r ${it.color==='red'?'sel':''}" onclick="setColor('${p.id}',${ix},'red')" title="Sin stock"></button>
           <button class="cbtn a ${it.color==='amber'?'sel':''}" onclick="setColor('${p.id}',${ix},'amber')" title="Parcial"></button>
@@ -460,9 +474,9 @@ function renderAlmacen() {
       <div class="phead" onclick="togglePed('${p.id}')">
         <div class="pavatar">🏪</div>
         <div class="pinfo"><div class="ptitle">${esc(p.pv_nombre)}</div><div class="pmeta">${fechaES(p.creado)} ${badges}</div></div>
-        <span class="chev">${open ? '▲' : '▼'}</span>
+        <span class="chev">${open?'▲':'▼'}</span>
       </div>
-      <div class="pbody ${open ? 'open' : ''}">
+      <div class="pbody ${open?'open':''}">
         ${rows}
         <div class="acciones">
           <button class="btn btn-borde btn-sm" onclick="todoVerde('${p.id}')">✅ Todo surtido</button>
@@ -470,65 +484,62 @@ function renderAlmacen() {
         </div></div></div>`;
   }).join('');
 }
-function togglePed(id) { UI.abiertos.has(id) ? UI.abiertos.delete(id) : UI.abiertos.add(id); renderAlmacen(); }
-async function setColor(pid, ix, color) {
-  const p = DB.pedidos.find(x => x.id === pid); if (!p) return;
-  p.items[ix].color = p.items[ix].color === color ? null : color;
+function togglePed(id){UI.abiertos.has(id)?UI.abiertos.delete(id):UI.abiertos.add(id);renderAlmacen()}
+async function setColor(pid,ix,color){
+  const p=DB.pedidos.find(x=>x.id===pid);if(!p)return;
+  p.items[ix].color=p.items[ix].color===color?null:color;
   renderAlmacen();
-  try { await sb.from('pedidos').update({ items: p.items }).eq('id', pid); }
-  catch (e) { toast('Error guardando', true); }
+  try{await sb.from('pedidos').update({items:p.items}).eq('id',pid)}
+  catch(e){toast('Error guardando',true)}
 }
-async function todoVerde(pid) {
-  const p = DB.pedidos.find(x => x.id === pid); if (!p) return;
-  p.items.forEach(i => i.color = 'green');
-  renderAlmacen();
-  try { await sb.from('pedidos').update({ items: p.items }).eq('id', pid); }
-  catch (e) { toast('Error guardando', true); }
+async function todoVerde(pid){
+  const p=DB.pedidos.find(x=>x.id===pid);if(!p)return;
+  p.items.forEach(i=>i.color='green');renderAlmacen();
+  try{await sb.from('pedidos').update({items:p.items}).eq('id',pid)}
+  catch(e){toast('Error guardando',true)}
 }
-async function generarAlbaran(pid) {
-  const p = DB.pedidos.find(x => x.id === pid); if (!p || !sb) return;
-  const sinMarcar = p.items.filter(i => !i.color).length;
-  if (sinMarcar && !confirm(`Hay ${sinMarcar} artículo(s) sin revisar (sin color). ¿Generar el albarán igualmente?`)) return;
-  try {
-    const { count } = await sb.from('albaranes').select('*', { count: 'exact', head: true });
-    const numero = 'ALB-' + String(1001 + (count || 0)).padStart(4, '0');
-    const tieneRojo = p.items.some(i => i.color === 'red');
-    const tieneAmbar = p.items.some(i => i.color === 'amber');
-    const estado = tieneRojo ? 'incidencias' : tieneAmbar ? 'parcial' : 'completo';
-    const { error: e1 } = await sb.from('albaranes').insert({ numero, pv_id: p.pv_id, pv_nombre: p.pv_nombre, items: p.items, estado });
-    if (e1) throw e1;
-    const { error: e2 } = await sb.from('pedidos').update({ estado: 'completado' }).eq('id', pid);
-    if (e2) throw e2;
-    toast('📄 Albarán ' + numero + ' generado');
-    cargarPedidos(); cargarAlbaranes();
-  } catch (e) { toast('Error: ' + (e.message || e), true); }
+async function generarAlbaran(pid){
+  const p=DB.pedidos.find(x=>x.id===pid);if(!p||!sb)return;
+  const sinMarcar=p.items.filter(i=>!i.color).length;
+  if(sinMarcar&&!confirm(`Hay ${sinMarcar} artículo(s) sin revisar. ¿Generar el albarán igualmente?`))return;
+  try{
+    const{count}=await sb.from('albaranes').select('*',{count:'exact',head:true});
+    const numero='ALB-'+String(1001+(count||0)).padStart(4,'0');
+    const tieneRojo=p.items.some(i=>i.color==='red');
+    const tieneAmbar=p.items.some(i=>i.color==='amber');
+    const estado=tieneRojo?'incidencias':tieneAmbar?'parcial':'completo';
+    const{error:e1}=await sb.from('albaranes').insert({numero,pv_id:p.pv_id,pv_nombre:p.pv_nombre,items:p.items,estado});
+    if(e1)throw e1;
+    const{error:e2}=await sb.from('pedidos').update({estado:'completado'}).eq('id',pid);
+    if(e2)throw e2;
+    toast('📄 Albarán '+numero+' generado');
+    cargarPedidos();cargarAlbaranes();
+  }catch(e){toast('Error: '+(e.message||e),true)}
 }
 
-// ---------- PANTALLA ALBARANES ----------
-function renderAlbaranes() {
-  const fpv = $('f-pv'), valorPrevio = fpv.value;
-  const pvsUnicos = [...new Map(DB.albaranes.map(a => [a.pv_id, a.pv_nombre])).entries()];
-  fpv.innerHTML = '<option value="">Todos los puntos de venta</option>' + pvsUnicos.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join('');
-  fpv.value = valorPrevio;
-
-  let albs = DB.albaranes;
-  if (fpv.value) albs = albs.filter(a => a.pv_id === fpv.value);
-  const fe = $('f-est').value;
-  if (fe) albs = albs.filter(a => a.estado === fe);
-
-  const L = $('lista-albaranes');
-  if (!albs.length) { L.innerHTML = '<div class="empty"><span class="ico">📂</span>No hay albaranes</div>'; return; }
-  L.innerHTML = albs.map(a => {
-    const open = UI.albAbiertos.has(a.id);
-    const bm = { completo: '<span class="badge b-verde">Completo</span>', parcial: '<span class="badge b-ambar">Parcial</span>', incidencias: '<span class="badge b-rojo">Con incidencias</span>' };
-    const porArea = {};
-    a.items.forEach(i => { (porArea[i.area] = porArea[i.area] || []).push(i); });
-    const filas = Object.entries(porArea).map(([area, its]) =>
-      `<tr class="alb-area-row"><td colspan="4">${esc(area)}</td></tr>` +
-      its.map(i => {
-        const pl = i.color === 'green' ? 'pl-g' : i.color === 'amber' ? 'pl-a' : i.color === 'red' ? 'pl-r' : '';
-        const tx = i.color === 'green' ? 'Completo' : i.color === 'amber' ? 'Parcial' : i.color === 'red' ? 'Sin stock' : '—';
-        return `<tr><td>${pl ? '<span class="pill ' + pl + '"></span>' : ''}${esc(i.nombre)}</td><td style="text-align:center">${i.cantidad}</td><td>${esc(i.unidad)}</td><td style="text-align:right;color:var(--gris-texto)">${tx}</td></tr>`;
+// ---------- ALBARANES ----------
+function renderAlbaranes(){
+  const fpv=$('f-pv'),vp=fpv.value;
+  const pvsU=[...new Map(DB.albaranes.map(a=>[a.pv_id,a.pv_nombre])).entries()];
+  fpv.innerHTML='<option value="">Todos los puntos de venta</option>'+pvsU.map(([id,n])=>`<option value="${id}">${esc(n)}</option>`).join('');
+  fpv.value=vp;
+  let albs=DB.albaranes;
+  if(fpv.value)albs=albs.filter(a=>a.pv_id===fpv.value);
+  const fe=$('f-est').value;
+  if(fe)albs=albs.filter(a=>a.estado===fe);
+  const L=$('lista-albaranes');
+  if(!albs.length){L.innerHTML='<div class="empty"><span class="ico">📂</span>No hay albaranes</div>';return}
+  L.innerHTML=albs.map(a=>{
+    const open=UI.albAbiertos.has(a.id);
+    const bm={completo:'<span class="badge b-v">Completo</span>',parcial:'<span class="badge b-am">Parcial</span>',incidencias:'<span class="badge b-r">Con incidencias</span>'};
+    const porArea={};
+    a.items.forEach(i=>{(porArea[i.area]=porArea[i.area]||[]).push(i)});
+    const filas=Object.entries(porArea).map(([area,its])=>
+      `<tr class="alb-area-row"><td colspan="5">${esc(area)}</td></tr>`+
+      its.map(i=>{
+        const pl=i.color==='green'?'pl-g':i.color==='amber'?'pl-a':i.color==='red'?'pl-r':'';
+        const tx=i.color==='green'?'Completo':i.color==='amber'?'Parcial':i.color==='red'?'Sin stock':'—';
+        return `<tr><td>${pl?'<span class="pill '+pl+'"></span>':''}${esc(i.nombre)}</td><td style="text-align:center">${i.cantidad}</td><td>${esc(i.formato||i.unidad||'ud')}</td><td style="text-align:right;color:var(--gris)">${tx}</td></tr>`;
       }).join('')
     ).join('');
     return `<div class="card">
@@ -536,131 +547,154 @@ function renderAlbaranes() {
         <div class="pavatar">📄</div>
         <div class="pinfo">
           <div class="ptitle">${esc(a.pv_nombre)} <span class="alb-num">${esc(a.numero)}</span></div>
-          <div class="pmeta">${fechaES(a.creado)} ${bm[a.estado] || ''}</div>
-        </div><span class="chev">${open ? '▲' : '▼'}</span>
+          <div class="pmeta">${fechaES(a.creado)} ${bm[a.estado]||''}</div>
+        </div><span class="chev">${open?'▲':'▼'}</span>
       </div>
-      <div class="pbody ${open ? 'open' : ''}">
+      <div class="pbody ${open?'open':''}">
         <div class="alb-doc">
           <div class="alb-top">
             <div><div style="font-size:16px;font-weight:700">${esc(a.pv_nombre)}</div><div class="muted">Albarán de entrega</div></div>
             <div style="text-align:right"><div class="alb-num">${esc(a.numero)}</div><div class="muted">${fechaES(a.creado)}</div></div>
           </div>
           <table class="alb">
-            <thead><tr><th>Artículo</th><th style="text-align:center">Cant.</th><th>Ud.</th><th style="text-align:right">Estado</th></tr></thead>
+            <thead><tr><th>Artículo</th><th style="text-align:center">Cant.</th><th>Formato</th><th style="text-align:right">Estado</th></tr></thead>
             <tbody>${filas}</tbody>
           </table>
         </div>
-        <div style="margin-top:10px"><button class="btn btn-borde btn-sm" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button></div>
+        <div style="margin-top:10px"><button class="btn btn-borde btn-sm" onclick="window.print()">🖨️ Imprimir / PDF</button></div>
       </div></div>`;
   }).join('');
 }
-function toggleAlb(id) { UI.albAbiertos.has(id) ? UI.albAbiertos.delete(id) : UI.albAbiertos.add(id); renderAlbaranes(); }
+function toggleAlb(id){UI.albAbiertos.has(id)?UI.albAbiertos.delete(id):UI.albAbiertos.add(id);renderAlbaranes()}
 
-// ---------- AJUSTES / ADMIN ----------
-function renderAdmin() {
-  $('admin-pvs').innerHTML = DB.pvs.map(pv =>
+// ---------- ADMIN ----------
+function renderAdmin(){
+  $('admin-pvs').innerHTML=DB.pvs.map(pv=>
     `<div class="lrow"><span class="nom">🏪 ${esc(pv.nombre)}</span><button class="del" onclick="borrarPV('${pv.id}')">🗑️</button></div>`
-  ).join('') || '<div class="lrow"><span class="nom muted">Sin puntos de venta</span></div>';
+  ).join('')||'<div class="lrow"><span class="nom muted">Sin puntos de venta</span></div>';
 
-  $('admin-areas').innerHTML = DB.areas.map(a =>
+  $('admin-areas').innerHTML=DB.areas.map(a=>
     `<div class="lrow"><span class="nom">📍 ${esc(a.nombre)}</span><button class="del" onclick="borrarArea('${a.id}','${esc(a.nombre)}')">🗑️</button></div>`
-  ).join('') || '<div class="lrow"><span class="nom muted">Sin áreas</span></div>';
+  ).join('')||'<div class="lrow"><span class="nom muted">Sin áreas</span></div>';
 
-  $('np-area').innerHTML = DB.areas.map(a => `<option value="${esc(a.nombre)}">${esc(a.nombre)}</option>`).join('');
-  $('prod-count').textContent = DB.productos.length + ' productos en el catálogo';
-  $('admin-prods').innerHTML = DB.productos.slice(0, 300).map(p =>
-    `<div class="lrow"><span class="nom">${esc(p.nombre)} <span class="muted">· ${esc(p.unidad)} · ${esc(p.area)}</span></span><button class="del" onclick="borrarProducto('${p.id}')">🗑️</button></div>`
-  ).join('') || '<div class="lrow"><span class="nom muted">Catálogo vacío — importa tu Excel</span></div>';
-}
-async function agregarPV() {
-  const n = $('nuevo-pv').value.trim(); if (!n || !sb) return;
-  const { error } = await sb.from('puntos_venta').insert({ nombre: n });
-  if (error) return toast('Error: ' + error.message, true);
-  $('nuevo-pv').value = ''; toast('Punto de venta añadido'); cargarCatalogo();
-}
-async function borrarPV(id) {
-  if (!confirm('¿Desactivar este punto de venta? (su histórico se conserva)')) return;
-  const { error } = await sb.from('puntos_venta').update({ activo: false }).eq('id', id);
-  if (error) return toast('Error: ' + error.message, true);
-  if (UI.pv === id) UI.pv = null;
-  toast('Punto de venta desactivado'); cargarCatalogo();
-}
-async function agregarArea() {
-  const n = $('nueva-area').value.trim(); if (!n || !sb) return;
-  const { error } = await sb.from('areas').insert({ nombre: n });
-  if (error) return toast('Error: ' + error.message, true);
-  $('nueva-area').value = ''; toast('Área añadida'); cargarCatalogo();
-}
-async function borrarArea(id, nombre) {
-  const enUso = DB.productos.filter(p => p.area === nombre).length;
-  if (enUso && !confirm(`Hay ${enUso} productos en "${nombre}". ¿Borrar el área igualmente? (los productos quedarán huérfanos)`)) return;
-  if (!enUso && !confirm('¿Borrar el área "' + nombre + '"?')) return;
-  const { error } = await sb.from('areas').delete().eq('id', id);
-  if (error) return toast('Error: ' + error.message, true);
-  if (UI.area === nombre) UI.area = null;
-  toast('Área borrada'); cargarCatalogo();
-}
-async function agregarProducto() {
-  const n = $('np-nombre').value.trim(), u = $('np-unidad').value.trim() || 'ud', a = $('np-area').value;
-  if (!n || !a || !sb) return toast('Completa nombre y área', true);
-  const { error } = await sb.from('productos').insert({ nombre: n, unidad: u, area: a });
-  if (error) return toast('Error: ' + error.message, true);
-  $('np-nombre').value = ''; $('np-unidad').value = '';
-  toast('Producto añadido'); cargarCatalogo();
-}
-async function borrarProducto(id) {
-  const { error } = await sb.from('productos').update({ activo: false }).eq('id', id);
-  if (error) return toast('Error: ' + error.message, true);
-  toast('Producto eliminado'); cargarCatalogo();
+  $('np-area').innerHTML=DB.areas.map(a=>`<option value="${esc(a.nombre)}">${esc(a.nombre)}</option>`).join('');
+  $('prod-count').textContent=DB.productos.length+' productos en el catálogo';
+
+  $('admin-prods').innerHTML=DB.productos.slice(0,300).map(p=>{
+    const fmts=getFormatos(p);
+    const tags=fmts.map((f,i)=>`<span class="fmt-tag">${esc(f)}<button onclick="quitarFmt('${p.id}',${i})">×</button></span>`).join('');
+    return `<div class="lrow" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <div style="display:flex;width:100%;align-items:center">
+        <span class="nom"><b>${esc(p.nombre)}</b> <span class="muted">· ${esc(p.unidad)} · ${esc(p.area)}</span></span>
+        <button class="del" onclick="borrarProducto('${p.id}')">🗑️</button>
+      </div>
+      <div style="padding-left:2px">
+        ${tags}
+        <div class="fmt-add-row">
+          <input type="text" id="nf_${p.id}" placeholder="+ formato (ej: Caja 12ud)" onkeydown="if(event.key==='Enter')addFmt('${p.id}')">
+          <button class="btn btn-azul btn-sm" onclick="addFmt('${p.id}')">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')||'<div class="lrow"><span class="nom muted">Catálogo vacío</span></div>';
 }
 
-// ---------- IMPORTACIÓN EXCEL ----------
-function reemplazarCatalogo() {
-  if (!confirm('Esto desactivará TODO el catálogo actual y lo sustituirá por el contenido del Excel. ¿Continuar?')) return;
-  UI.modoReemplazo = true;
-  $('excel-input').click();
+async function agregarPV(){
+  const n=$('nuevo-pv').value.trim();if(!n||!sb)return;
+  const{error}=await sb.from('puntos_venta').insert({nombre:n});
+  if(error)return toast('Error: '+error.message,true);
+  $('nuevo-pv').value='';toast('Punto de venta añadido');cargarCatalogo();
 }
-async function importarExcel(ev) {
-  const file = ev.target.files[0]; if (!file || !sb) return;
-  ev.target.value = '';
-  const reemplazar = UI.modoReemplazo; UI.modoReemplazo = false;
-  try {
-    const buf = await file.arrayBuffer();
-    const wb = XLSX.read(buf);
-    const hoja = wb.Sheets[wb.SheetNames[0]];
-    const filas = XLSX.utils.sheet_to_json(hoja, { defval: '' });
-    if (!filas.length) return toast('El Excel está vacío', true);
+async function borrarPV(id){
+  if(!confirm('¿Desactivar este punto de venta?'))return;
+  const{error}=await sb.from('puntos_venta').update({activo:false}).eq('id',id);
+  if(error)return toast('Error: '+error.message,true);
+  if(UI.pv===id)UI.pv=null;toast('Desactivado');cargarCatalogo();
+}
+async function agregarArea(){
+  const n=$('nueva-area').value.trim();if(!n||!sb)return;
+  const{error}=await sb.from('areas').insert({nombre:n});
+  if(error)return toast('Error: '+error.message,true);
+  $('nueva-area').value='';toast('Área añadida');cargarCatalogo();
+}
+async function borrarArea(id,nombre){
+  if(!confirm('¿Borrar el área "'+nombre+'"?'))return;
+  const{error}=await sb.from('areas').delete().eq('id',id);
+  if(error)return toast('Error: '+error.message,true);
+  if(UI.area===nombre)UI.area=null;toast('Área borrada');cargarCatalogo();
+}
+async function agregarProducto(){
+  const n=$('np-nombre').value.trim(),u=$('np-unidad').value.trim()||'ud',a=$('np-area').value;
+  if(!n||!a||!sb)return toast('Completa nombre y área',true);
+  const{error}=await sb.from('productos').insert({nombre:n,unidad:u,area:a,formatos:[u]});
+  if(error)return toast('Error: '+error.message,true);
+  $('np-nombre').value='';$('np-unidad').value='';toast('Producto añadido');cargarCatalogo();
+}
+async function borrarProducto(id){
+  const{error}=await sb.from('productos').update({activo:false}).eq('id',id);
+  if(error)return toast('Error: '+error.message,true);
+  toast('Producto eliminado');cargarCatalogo();
+}
 
-    const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-    const claves = Object.keys(filas[0]);
-    const cProd = claves.find(k => ['producto','nombre','articulo','descripcion','referencia'].includes(norm(k)));
-    const cUni = claves.find(k => ['unidad','ud','medida','formato'].includes(norm(k)));
-    const cArea = claves.find(k => ['area','zona','seccion','departamento','categoria'].includes(norm(k)));
-    if (!cProd || !cArea) return toast('No encuentro las columnas Producto y Area en el Excel', true);
+// formatos por producto
+async function addFmt(prodId){
+  const inp=$('nf_'+prodId);const val=inp.value.trim();if(!val)return;
+  const p=DB.productos.find(x=>x.id===prodId);if(!p)return;
+  const fmts=[...getFormatos(p),val];
+  const{error}=await sb.from('productos').update({formatos:fmts}).eq('id',prodId);
+  if(error)return toast('Error: '+error.message,true);
+  inp.value='';p.formatos=fmts;renderAdmin();toast('Formato añadido');
+}
+async function quitarFmt(prodId,idx){
+  const p=DB.productos.find(x=>x.id===prodId);if(!p)return;
+  const fmts=getFormatos(p).filter((_,i)=>i!==idx);
+  const{error}=await sb.from('productos').update({formatos:fmts.length?fmts:null}).eq('id',prodId);
+  if(error)return toast('Error: '+error.message,true);
+  p.formatos=fmts;renderAdmin();
+}
 
-    const nuevos = filas
-      .filter(f => String(f[cProd]).trim())
-      .map(f => ({ nombre: String(f[cProd]).trim(), unidad: cUni ? (String(f[cUni]).trim() || 'ud') : 'ud', area: String(f[cArea]).trim() }));
-
-    if (reemplazar) {
-      const { error } = await sb.from('productos').update({ activo: false }).eq('activo', true);
-      if (error) throw error;
-    }
-    for (let i = 0; i < nuevos.length; i += 100) {
-      const { error } = await sb.from('productos').insert(nuevos.slice(i, i + 100));
-      if (error) throw error;
-    }
-    const areasExcel = [...new Set(nuevos.map(n => n.area))];
-    const areasFaltan = areasExcel.filter(a => !DB.areas.some(x => x.nombre === a));
-    if (areasFaltan.length) {
-      await sb.from('areas').insert(areasFaltan.map(nombre => ({ nombre })));
-    }
-    toast(`✅ ${nuevos.length} productos importados` + (areasFaltan.length ? ` (+${areasFaltan.length} áreas nuevas)` : ''));
+// ---------- EXCEL ----------
+function reemplazarCatalogo(){
+  if(!confirm('Esto desactivará todo el catálogo actual. ¿Continuar?'))return;
+  UI.modoReemplazo=true;$('excel-input').click();
+}
+async function importarExcel(ev){
+  const file=ev.target.files[0];if(!file||!sb)return;ev.target.value='';
+  const reemplazar=UI.modoReemplazo;UI.modoReemplazo=false;
+  try{
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf);
+    const hoja=wb.Sheets[wb.SheetNames[0]];
+    const filas=XLSX.utils.sheet_to_json(hoja,{defval:''});
+    if(!filas.length)return toast('El Excel está vacío',true);
+    const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    const claves=Object.keys(filas[0]);
+    const cProd=claves.find(k=>['producto','nombre','articulo','descripcion','referencia'].includes(norm(k)));
+    const cUni=claves.find(k=>['unidad','ud','medida'].includes(norm(k)));
+    const cArea=claves.find(k=>['area','zona','seccion','departamento','categoria'].includes(norm(k)));
+    const cFmts=claves.find(k=>['formatos','formatos_disponibles','opciones','formato'].includes(norm(k)));
+    if(!cProd)return toast('No encuentro la columna Producto/Nombre',true);
+    if(!cArea)return toast('No encuentro la columna Area/Zona',true);
+    const nuevos=filas.filter(f=>String(f[cProd]).trim()).map(f=>{
+      // unidad: usa la columna Unidad si existe y no está vacía, si no 'ud'
+      const unidad=(cUni&&String(f[cUni]).trim()&&String(f[cUni]).trim()!=='nan')?String(f[cUni]).trim():'ud';
+      let formatos=null;
+      if(cFmts&&String(f[cFmts]).trim()&&String(f[cFmts]).trim()!=='nan'){
+        formatos=String(f[cFmts]).split(',').map(x=>x.trim()).filter(Boolean);
+      }
+      if(!formatos||!formatos.length)formatos=[unidad];
+      return{nombre:String(f[cProd]).trim(),unidad:formatos[0],area:String(f[cArea]).trim(),formatos};
+    });
+    if(reemplazar){const{error}=await sb.from('productos').update({activo:false}).eq('activo',true);if(error)throw error}
+    for(let i=0;i<nuevos.length;i+=100){const{error}=await sb.from('productos').insert(nuevos.slice(i,i+100));if(error)throw error}
+    const areasExcel=[...new Set(nuevos.map(n=>n.area))];
+    const faltanAreas=areasExcel.filter(a=>!DB.areas.some(x=>x.nombre===a));
+    if(faltanAreas.length)await sb.from('areas').insert(faltanAreas.map(nombre=>({nombre})));
+    toast(`✅ ${nuevos.length} productos importados`+(faltanAreas.length?` (+${faltanAreas.length} áreas)`:''));
     cargarCatalogo();
-  } catch (e) { toast('Error al importar: ' + (e.message || e), true); }
+  }catch(e){toast('Error al importar: '+(e.message||e),true)}
 }
 
-// ---------- INICIO ----------
 initConexion();
 </script>
 </body>
