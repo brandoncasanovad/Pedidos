@@ -213,6 +213,7 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
   <div class="card">
     <div class="lista-admin" id="admin-areas"></div>
     <div class="add-row">
+      <select id="sel-pv-area" style="flex:1;min-width:120px"></select>
       <input type="text" id="nueva-area" placeholder="Nombre de la nueva área">
       <button class="btn btn-azul btn-sm" onclick="agregarArea()">+ Añadir</button>
     </div>
@@ -314,11 +315,12 @@ async function cargarCatalogo(){
       sb.from('productos').select('*').eq('activo',true).order('nombre'),
     ]);
     if(pvs.error||areas.error||prods.error)throw(pvs.error||areas.error||prods.error);
-    DB.pvs=pvs.data;DB.areas=areas.data;DB.todosProductos=prods.data;
+    DB.pvs=pvs.data;DB.todasAreas=areas.data;DB.todosProductos=prods.data;
     if(!UI.pv&&DB.pvs.length)UI.pv=DB.pvs[0].id;
-    if(!UI.area&&DB.areas.length)UI.area=DB.areas[0].nombre;
-    // filtrar productos del punto de venta seleccionado (los sin restaurante asignado se ven en todos)
+    // filtrar áreas y productos del punto de venta seleccionado (los sin restaurante asignado se ven en todos)
+    DB.areas=DB.todasAreas.filter(a=>!a.pv_id||a.pv_id===UI.pv);
     DB.productos=DB.todosProductos.filter(p=>!p.pv_id||p.pv_id===UI.pv);
+    if(!UI.area&&DB.areas.length)UI.area=DB.areas[0].nombre;
     renderPedidoUI();renderAdmin();
   }catch(e){toast('Error cargando: '+(e.message||e),true)}
 }
@@ -361,7 +363,10 @@ function getFormatos(prod){
 
 function seleccionarPV(id){
   UI.pv=id;
+  UI.area=null;
+  if(DB.todasAreas)DB.areas=DB.todasAreas.filter(a=>!a.pv_id||a.pv_id===id);
   if(DB.todosProductos)DB.productos=DB.todosProductos.filter(p=>!p.pv_id||p.pv_id===id);
+  if(DB.areas.length)UI.area=DB.areas[0].nombre;
   renderPedidoUI();
 }
 
@@ -591,9 +596,13 @@ function renderAdmin(){
   $('admin-pvs').innerHTML=DB.pvs.map(pv=>
     `<div class="lrow"><span class="nom">🏪 ${esc(pv.nombre)}</span><button class="del" onclick="borrarPV('${pv.id}')">🗑️</button></div>`
   ).join('')||'<div class="lrow"><span class="nom muted">Sin puntos de venta</span></div>';
-  $('admin-areas').innerHTML=DB.areas.map(a=>
-    `<div class="lrow"><span class="nom">📍 ${esc(a.nombre)}</span><button class="del" onclick="borrarArea('${a.id}','${esc(a.nombre)}')">🗑️</button></div>`
-  ).join('')||'<div class="lrow"><span class="nom muted">Sin áreas</span></div>';
+  const todasAreas=DB.todasAreas||DB.areas;
+  $('admin-areas').innerHTML=todasAreas.map(a=>{
+    const pvNom=DB.pvs.find(p=>p.id===a.pv_id)?.nombre||'Global';
+    return `<div class="lrow"><span class="nom">📍 ${esc(a.nombre)} <span class="muted">· ${esc(pvNom)}</span></span><button class="del" onclick="borrarArea('${a.id}','${esc(a.nombre)}')">🗑️</button></div>`;
+  }).join('')||'<div class="lrow"><span class="nom muted">Sin áreas</span></div>';
+  const selPvArea=$('sel-pv-area');
+  if(selPvArea)selPvArea.innerHTML='<option value="">Global</option>'+DB.pvs.map(p=>`<option value="${p.id}">${esc(p.nombre)}</option>`).join('');
   $('np-area').innerHTML=DB.areas.map(a=>`<option value="${esc(a.nombre)}">${esc(a.nombre)}</option>`).join('');
   $('prod-count').textContent=DB.productos.length+' productos en el catálogo';
 
@@ -649,7 +658,8 @@ async function borrarPV(id){
 }
 async function agregarArea(){
   const n=$('nueva-area').value.trim();if(!n||!sb)return;
-  const{error}=await sb.from('areas').insert({nombre:n});
+  const pvSelArea=$('sel-pv-area')?.value||null;
+  const{error}=await sb.from('areas').insert({nombre:n,pv_id:pvSelArea||null});
   if(error)return toast('Error: '+error.message,true);
   $('nueva-area').value='';toast('Área añadida');cargarCatalogo();
 }
@@ -662,7 +672,7 @@ async function borrarArea(id,nombre){
 async function agregarProducto(){
   const n=$('np-nombre').value.trim(),u=$('np-unidad').value.trim()||'ud',a=$('np-area').value;
   if(!n||!a||!sb)return toast('Completa nombre y área',true);
-  const{error}=await sb.from('productos').insert({nombre:n,unidad:u,area:a,formatos:[u]});
+  const{error}=await sb.from('productos').insert({nombre:n,unidad:u,area:a,formatos:[u],pv_id:UI.pv||null});
   if(error)return toast('Error: '+error.message,true);
   $('np-nombre').value='';$('np-unidad').value='';toast('Producto añadido');cargarCatalogo();
 }
@@ -746,11 +756,22 @@ async function importarExcel(ev){
       }
     }
     for(let i=0;i<nuevos.length;i+=100){const{error}=await sb.from('productos').insert(nuevos.slice(i,i+100));if(error)throw error}
-    const areasExcel=[...new Set(nuevos.map(n=>n.area))];
-    const faltanAreas=areasExcel.filter(a=>!DB.areas.some(x=>x.nombre===a));
-    if(faltanAreas.length)await sb.from('areas').insert(faltanAreas.map(nombre=>({nombre})));
+    // crear áreas nuevas vinculadas al restaurante correspondiente
+    let areasCreadas=0;
+    const pvIdsArea=[...new Set(nuevos.map(n=>n.pv_id).filter(Boolean))];
+    for(const pvId of pvIdsArea){
+      const areasDeEstePV=[...new Set(nuevos.filter(n=>n.pv_id===pvId).map(n=>n.area))];
+      const existentes=await sb.from('areas').select('nombre').eq('pv_id',pvId);
+      const nombresExistentes=(existentes.data||[]).map(a=>a.nombre);
+      const faltanPV=areasDeEstePV.filter(a=>!nombresExistentes.includes(a));
+      if(faltanPV.length){await sb.from('areas').insert(faltanPV.map(nombre=>({nombre,pv_id:pvId})));areasCreadas+=faltanPV.length;}
+    }
+    // áreas de productos sin restaurante asignado → áreas globales (se ven en todos)
+    const areasSinPV=[...new Set(nuevos.filter(n=>!n.pv_id).map(n=>n.area))];
+    const faltanGlobal=areasSinPV.filter(a=>!(DB.todasAreas||DB.areas).some(x=>x.nombre===a&&!x.pv_id));
+    if(faltanGlobal.length){await sb.from('areas').insert(faltanGlobal.map(nombre=>({nombre})));areasCreadas+=faltanGlobal.length;}
     const sinRestaurante=cRest?nuevos.filter(n=>!n.pv_id).length:0;
-    toast(`✅ ${nuevos.length} productos importados`+(faltanAreas.length?` (+${faltanAreas.length} áreas)`:'')+(sinRestaurante?` — ⚠️ ${sinRestaurante} sin restaurante asignado`:''));
+    toast(`✅ ${nuevos.length} productos importados`+(areasCreadas?` (+${areasCreadas} áreas)`:'')+(sinRestaurante?` — ⚠️ ${sinRestaurante} sin restaurante asignado`:''));
     cargarCatalogo();
   }catch(e){toast('Error al importar: '+(e.message||e),true)}
 }
