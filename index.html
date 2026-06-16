@@ -255,7 +255,7 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 <script>
 let sb=null;
 let DB={pvs:[],areas:[],productos:[],todosProductos:[],pedidos:[],albaranes:[]};
-let UI={pv:null,area:null,cant:{},fmt:{},fmtLibre:{},abiertos:new Set(),albAbiertos:new Set(),modoReemplazo:false};
+let UI={pv:null,area:null,cant:{},fmt:{},fmtLibre:{},abiertos:new Set(),albAbiertos:new Set(),modoReemplazo:false,generandoAlb:new Set()};
 let pollTimer=null;
 
 const FORMATOS_DEFAULT=['Unidad','Caja','Saco','Palet','Bolsa','Botella','Garrafa','Paquete','Rollo','Barril'];
@@ -517,7 +517,18 @@ async function generarAlbaran(pid){
   const p=DB.pedidos.find(x=>x.id===pid);if(!p||!sb)return;
   const sinMarcar=p.items.filter(i=>!i.color).length;
   if(sinMarcar&&!confirm(`Hay ${sinMarcar} artículo(s) sin revisar. ¿Generar el albarán igualmente?`))return;
+  if(UI.generandoAlb.has(pid))return;
+  UI.generandoAlb.add(pid);
   try{
+    // Reclamar el pedido de forma atómica: solo pasa a "completado" si todavía estaba "pendiente".
+    // Si otro toque (doble tap) o otra tablet ya lo procesó, aquí no devuelve filas y no se duplica el albarán.
+    const{data:reclamado,error:e2}=await sb.from('pedidos').update({estado:'completado'}).eq('id',pid).eq('estado','pendiente').select();
+    if(e2)throw e2;
+    if(!reclamado||!reclamado.length){
+      toast('Este pedido ya se había procesado',true);
+      cargarPedidos();
+      return;
+    }
     const{count}=await sb.from('albaranes').select('*',{count:'exact',head:true});
     const numero='ALB-'+String(1001+(count||0)).padStart(4,'0');
     const tieneRojo=p.items.some(i=>i.color==='red');
@@ -525,11 +536,10 @@ async function generarAlbaran(pid){
     const estado=tieneRojo?'incidencias':tieneAmbar?'parcial':'completo';
     const{error:e1}=await sb.from('albaranes').insert({numero,pv_id:p.pv_id,pv_nombre:p.pv_nombre,items:p.items,estado});
     if(e1)throw e1;
-    const{error:e2}=await sb.from('pedidos').update({estado:'completado'}).eq('id',pid);
-    if(e2)throw e2;
     toast('📄 Albarán '+numero+' generado');
     cargarPedidos();cargarAlbaranes();
   }catch(e){toast('Error: '+(e.message||e),true)}
+  finally{UI.generandoAlb.delete(pid);}
 }
 
 function renderAlbaranes(){
