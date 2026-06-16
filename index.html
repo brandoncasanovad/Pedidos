@@ -176,7 +176,10 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 <div class="screen" id="s2">
   <div class="refresh-bar">
     <h2 style="margin:0">Histórico de albaranes</h2>
-    <button class="btn-refresh" onclick="cargarAlbaranes(true)">🔄 Actualizar</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-refresh" onclick="cargarAlbaranes(true)">🔄 Actualizar</button>
+      <button class="btn-refresh" style="border-color:var(--rojo);color:var(--rojo-t)" onclick="limpiarAlbaranes()">🗑️ Limpiar todo</button>
+    </div>
   </div>
   <div class="filtros">
     <select id="f-pv" onchange="renderAlbaranes()"><option value="">Todos los puntos de venta</option></select>
@@ -216,11 +219,12 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
   </div>
   <h2>Catálogo de productos</h2>
   <div class="card card-pad">
-    <p class="muted" style="margin-bottom:12px">Columnas Excel: <b>Producto, Area, Formatos</b> (opcional: <b>Unidad, Color</b>). Colores disponibles: amarillo, verde, azul, rojo, naranja, morado, rosa, negro, gris.</p>
+    <p class="muted" style="margin-bottom:12px">Columnas Excel: <b>Producto, Area, Formatos</b> (opcional: <b>Unidad, Color, Restaurante</b>). Si añades la columna <b>Restaurante</b>, ese producto solo aparecerá en el punto de venta indicado — el nombre debe coincidir exactamente con el de la lista de Puntos de venta de aquí abajo. Colores disponibles: amarillo, verde, azul, rojo, naranja, morado, rosa, negro, gris.</p>
     <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="importarExcel(event)">
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn btn-borde btn-sm" onclick="document.getElementById('excel-input').click()">📥 Importar Excel (añadir)</button>
       <button class="btn btn-rojo-b btn-sm" onclick="reemplazarCatalogo()">🔄 Importar Excel (reemplazar)</button>
+      <button class="btn btn-rojo-b btn-sm" onclick="limpiarCatalogo()">🗑️ Vaciar catálogo</button>
     </div>
     <p class="muted" style="margin-top:10px" id="prod-count"></p>
   </div>
@@ -249,7 +253,7 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 
 <script>
 let sb=null;
-let DB={pvs:[],areas:[],productos:[],pedidos:[],albaranes:[]};
+let DB={pvs:[],areas:[],productos:[],todosProductos:[],pedidos:[],albaranes:[]};
 let UI={pv:null,area:null,cant:{},fmt:{},fmtLibre:{},abiertos:new Set(),albAbiertos:new Set(),modoReemplazo:false};
 let pollTimer=null;
 
@@ -310,9 +314,11 @@ async function cargarCatalogo(){
       sb.from('productos').select('*').eq('activo',true).order('nombre'),
     ]);
     if(pvs.error||areas.error||prods.error)throw(pvs.error||areas.error||prods.error);
-    DB.pvs=pvs.data;DB.areas=areas.data;DB.productos=prods.data;
+    DB.pvs=pvs.data;DB.areas=areas.data;DB.todosProductos=prods.data;
     if(!UI.pv&&DB.pvs.length)UI.pv=DB.pvs[0].id;
     if(!UI.area&&DB.areas.length)UI.area=DB.areas[0].nombre;
+    // filtrar productos del punto de venta seleccionado (los sin restaurante asignado se ven en todos)
+    DB.productos=DB.todosProductos.filter(p=>!p.pv_id||p.pv_id===UI.pv);
     renderPedidoUI();renderAdmin();
   }catch(e){toast('Error cargando: '+(e.message||e),true)}
 }
@@ -328,6 +334,10 @@ async function cargarPedidos(manual){
 async function cargarAlbaranes(manual){
   if(!sb)return;
   try{
+    // Limpiar albaranes con más de 8 días de antigüedad automáticamente
+    const limite=new Date();limite.setDate(limite.getDate()-8);
+    await sb.from('albaranes').delete().lt('creado',limite.toISOString());
+
     const{data,error}=await sb.from('albaranes').select('*').order('creado',{ascending:false}).limit(200);
     if(error)throw error;
     DB.albaranes=data;renderAlbaranes();
@@ -349,9 +359,15 @@ function getFormatos(prod){
   return FORMATOS_DEFAULT;
 }
 
+function seleccionarPV(id){
+  UI.pv=id;
+  if(DB.todosProductos)DB.productos=DB.todosProductos.filter(p=>!p.pv_id||p.pv_id===id);
+  renderPedidoUI();
+}
+
 function renderPedidoUI(){
   $('pv-chips').innerHTML=DB.pvs.map(pv=>
-    `<button class="chip ${pv.id===UI.pv?'active':''}" onclick="UI.pv='${pv.id}';renderPedidoUI()">${esc(pv.nombre)}</button>`
+    `<button class="chip ${pv.id===UI.pv?'active':''}" onclick="seleccionarPV('${pv.id}')">${esc(pv.nombre)}</button>`
   ).join('')||'<p class="muted">Añade un punto de venta en ⚙️ Ajustes</p>';
   $('area-chips').innerHTML=DB.areas.map(a=>
     `<button class="chip area ${a.nombre===UI.area?'active':''}" onclick="UI.area='${esc(a.nombre)}';renderPedidoUI()">${esc(a.nombre)}</button>`
@@ -560,6 +576,17 @@ function renderAlbaranes(){
 }
 function toggleAlb(id){UI.albAbiertos.has(id)?UI.albAbiertos.delete(id):UI.albAbiertos.add(id);renderAlbaranes()}
 
+async function limpiarAlbaranes(){
+  if(!confirm('¿Borrar TODO el histórico de albaranes? Esta acción no se puede deshacer.'))return;
+  if(!sb)return;
+  try{
+    const{error}=await sb.from('albaranes').delete().neq('id','00000000-0000-0000-0000-000000000000');
+    if(error)throw error;
+    DB.albaranes=[];renderAlbaranes();
+    toast('Histórico de albaranes borrado');
+  }catch(e){toast('Error: '+(e.message||e),true)}
+}
+
 function renderAdmin(){
   $('admin-pvs').innerHTML=DB.pvs.map(pv=>
     `<div class="lrow"><span class="nom">🏪 ${esc(pv.nombre)}</span><button class="del" onclick="borrarPV('${pv.id}')">🗑️</button></div>`
@@ -660,6 +687,19 @@ async function quitarFmt(prodId,idx){
   p.formatos=fmts;renderAdmin();
 }
 
+async function limpiarCatalogo(){
+  if(!confirm('¿Borrar TODOS los productos del catálogo? Los puntos de venta y áreas se conservan.'))return;
+  if(!confirm('Segunda confirmación — esta acción no se puede deshacer. ¿Continuar?'))return;
+  if(!sb)return;
+  try{
+    const{error}=await sb.from('productos').delete().neq('id','00000000-0000-0000-0000-000000000000');
+    if(error)throw error;
+    DB.productos=[];DB.todosProductos=[];
+    renderPedidoUI();renderAdmin();
+    toast('✅ Catálogo vaciado — ya puedes importar de nuevo');
+  }catch(e){toast('Error: '+(e.message||e),true)}
+}
+
 function reemplazarCatalogo(){
   if(!confirm('Esto desactivará todo el catálogo actual. ¿Continuar?'))return;
   UI.modoReemplazo=true;$('excel-input').click();
@@ -680,8 +720,10 @@ async function importarExcel(ev){
     const cArea=claves.find(k=>['area','zona','seccion','departamento','categoria'].includes(norm(k)));
     const cFmts=claves.find(k=>['formatos','formatos_disponibles','opciones','formato'].includes(norm(k)));
     const cColor=claves.find(k=>['color','colour','color_fondo','fondo'].includes(norm(k)));
+    const cRest=claves.find(k=>['restaurante','restaurant','pventa','punto de venta','pdv'].includes(norm(k)));
     if(!cProd)return toast('No encuentro la columna Producto/Nombre',true);
     if(!cArea)return toast('No encuentro la columna Area/Zona',true);
+    const pvMap={};DB.pvs.forEach(p=>{pvMap[p.nombre.toLowerCase().trim()]=p.id});
     const nuevos=filas.filter(f=>String(f[cProd]).trim()).map(f=>{
       const unidad=(cUni&&String(f[cUni]).trim()&&String(f[cUni]).trim()!=='nan')?String(f[cUni]).trim():'ud';
       let formatos=null;
@@ -691,14 +733,24 @@ async function importarExcel(ev){
       if(!formatos||!formatos.length)formatos=[unidad];
       const colorRaw=cColor?String(f[cColor]).trim():'';
       const color=normColor(colorRaw)||null;
-      return{nombre:String(f[cProd]).trim(),unidad:formatos[0],area:String(f[cArea]).trim(),formatos,color};
+      let pv_id=null;
+      if(cRest){const rn=String(f[cRest]).toLowerCase().trim();pv_id=pvMap[rn]||null;}
+      return{nombre:String(f[cProd]).trim(),unidad:formatos[0],area:String(f[cArea]).trim(),formatos,color,pv_id};
     });
-    if(reemplazar){const{error}=await sb.from('productos').update({activo:false}).eq('activo',true);if(error)throw error}
+    if(reemplazar){
+      const pvIds=[...new Set(nuevos.map(n=>n.pv_id).filter(Boolean))];
+      if(pvIds.length){
+        for(const pid of pvIds){const{error}=await sb.from('productos').update({activo:false}).eq('activo',true).eq('pv_id',pid);if(error)throw error}
+      }else{
+        const{error}=await sb.from('productos').update({activo:false}).eq('activo',true);if(error)throw error;
+      }
+    }
     for(let i=0;i<nuevos.length;i+=100){const{error}=await sb.from('productos').insert(nuevos.slice(i,i+100));if(error)throw error}
     const areasExcel=[...new Set(nuevos.map(n=>n.area))];
     const faltanAreas=areasExcel.filter(a=>!DB.areas.some(x=>x.nombre===a));
     if(faltanAreas.length)await sb.from('areas').insert(faltanAreas.map(nombre=>({nombre})));
-    toast(`✅ ${nuevos.length} productos importados`+(faltanAreas.length?` (+${faltanAreas.length} áreas)`:''));
+    const sinRestaurante=cRest?nuevos.filter(n=>!n.pv_id).length:0;
+    toast(`✅ ${nuevos.length} productos importados`+(faltanAreas.length?` (+${faltanAreas.length} áreas)`:'')+(sinRestaurante?` — ⚠️ ${sinRestaurante} sin restaurante asignado`:''));
     cargarCatalogo();
   }catch(e){toast('Error al importar: '+(e.message||e),true)}
 }
