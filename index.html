@@ -131,12 +131,85 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
 .toast.show{transform:translateX(-50%) translateY(0)}.toast.error{background:var(--rojo-t)}
 .loader{display:inline-block;width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* ===== Dinamismo y emoticonos ===== */
+.screen.active{animation:screenIn .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.tab{transition:color .2s,border-color .2s,transform .15s}
+.tab:active{transform:scale(.94)}
+.tab.active{animation:tabPop .3s ease}
+@keyframes tabPop{50%{transform:scale(1.08)}}
+.brand .logo{display:inline-block;animation:wiggle 4s ease-in-out infinite;transform-origin:50% 80%}
+@keyframes wiggle{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-12deg)}94%{transform:rotate(10deg)}97%{transform:rotate(-5deg)}}
+.dot.pop{animation:dotPop .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes dotPop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+
+.chip{transition:background .2s,color .2s,border-color .2s,transform .15s,box-shadow .2s}
+.chip:active{transform:scale(.93)}
+.chip.active{box-shadow:0 4px 12px rgba(24,95,165,.25)}
+.card{transition:box-shadow .25s,transform .25s}
+.phead:active{background:var(--fondo)}
+
+.prow{position:relative;transition:box-shadow .25s,transform .2s;animation:rowIn .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 35ms)}
+@keyframes rowIn{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.prow.has-q{box-shadow:inset 5px 0 0 var(--azul)}
+.pemoji{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.08);transition:transform .2s}
+.prow.has-q .pemoji{animation:emojiHappy 1.8s ease-in-out infinite}
+@keyframes emojiHappy{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-8deg) scale(1.08)}75%{transform:rotate(8deg) scale(1.08)}}
+.pemoji.bump{animation:emojiBump .4s cubic-bezier(.3,1.8,.5,1)!important}
+@keyframes emojiBump{0%{transform:scale(1)}40%{transform:scale(1.35) rotate(-10deg)}100%{transform:scale(1)}}
+.qbtn{transition:transform .12s,background .2s,border-color .2s}
+.qbtn:active{transform:scale(.85);opacity:1}
+.qbtn.mas{border-color:var(--azul);color:var(--azul);font-weight:700}
+.qval{display:inline-block;transition:color .2s}
+.qval.bump{animation:qBump .3s cubic-bezier(.3,1.8,.5,1)}
+@keyframes qBump{50%{transform:scale(1.5)}}
+.prow.has-q .qval{color:var(--azul)}
+.flyemoji{position:fixed;pointer-events:none;font-size:28px;z-index:300;animation:flyUp .9s ease-out forwards}
+@keyframes flyUp{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}30%{opacity:1;transform:translate(-50%,-140%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-320%) scale(.9)}}
+.flyemoji.menos{animation:flyDown .7s ease-in forwards}
+@keyframes flyDown{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,60%) scale(.4) rotate(40deg)}}
+
+.resumen{animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rrow{animation:fadeUp .3s ease both}
+.rrow .re{margin-right:6px}
+.btn{transition:transform .15s,background .25s,box-shadow .25s}
+.btn:active:not(:disabled){transform:scale(.97)}
+#btn-enviar:not(:disabled){box-shadow:0 6px 18px rgba(24,95,165,.35);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 6px 18px rgba(24,95,165,.35)}50%{box-shadow:0 6px 28px rgba(24,95,165,.6)}}
+.ncount{background:white;color:var(--azul);border-radius:12px;padding:1px 9px;font-size:14px;display:inline-block}
+.ncount.bump{animation:qBump .3s cubic-bezier(.3,1.8,.5,1)}
+
+.pbody.open{animation:fadeUp .3s ease}
+.chev{display:inline-block;transition:transform .3s}
+.chev.up{transform:rotate(180deg)}
+.irow{transition:background .3s;animation:fadeUp .3s ease both}
+.irow .iemo{font-size:20px;margin-right:2px}
+.cbtn{transition:transform .2s,border-color .2s}
+.cbtn:active{transform:scale(.85)}
+.empty .ico{animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.toast{transition:transform .45s cubic-bezier(.3,1.6,.5,1)}
+
+.emo-btn{width:40px;height:40px;border-radius:10px;border:1.5px dashed var(--borde);background:rgba(255,255,255,.8);font-size:22px;cursor:pointer;flex-shrink:0;transition:transform .15s}
+.emo-btn:active{transform:scale(.9)}
+.emo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin:12px 0}
+.emo-grid button{font-size:24px;height:44px;border-radius:10px;border:1.5px solid var(--borde);background:var(--blanco);cursor:pointer;transition:transform .12s}
+.emo-grid button:active{transform:scale(.85)}
+.emo-grid button.sel{border-color:var(--azul);background:var(--azul-c)}
+.overlay.show .modal{animation:modalIn .3s cubic-bezier(.3,1.4,.5,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:none}}
+
+.confeti{position:fixed;pointer-events:none;z-index:300;font-size:26px;animation:confeti 1.4s ease-out forwards}
+@keyframes confeti{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))}}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
 <div class="topbar"><div class="topbar-inner">
-  <div class="brand">📋 Pedidos PDV</div>
+  <div class="brand"><span class="logo">🛒</span> Pedidos PDV</div>
   <div class="tabs">
     <button class="tab active" data-t="0" onclick="goTab(0)">🛒 Pedidos</button>
     <button class="tab" data-t="1" onclick="goTab(1)">📦 Almacén <span class="dot" id="dot-alm" style="display:none">0</span></button>
@@ -250,6 +323,21 @@ table.alb td{padding:8px;border-bottom:1px solid var(--fondo)}
     <button class="btn btn-azul" onclick="conectarDesdeModal()">Conectar</button>
   </div>
 </div>
+<div class="overlay" id="overlay-emoji" onclick="if(event.target===this)cerrarEmoji()">
+  <div class="modal">
+    <h3 id="emo-titulo">Elige un emoticono</h3>
+    <p class="muted">Toca uno o escribe/pega el que quieras.</p>
+    <div class="emo-grid" id="emo-grid"></div>
+    <div style="display:flex;gap:8px">
+      <input type="text" id="emo-libre" placeholder="✏️ Otro emoticono" style="flex:1;font-size:18px" maxlength="8">
+      <button class="btn btn-azul btn-sm" onclick="guardarEmoji($('emo-libre').value.trim())">Guardar</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-borde btn-sm" style="flex:1" onclick="guardarEmoji('')">✨ Automático</button>
+      <button class="btn btn-borde btn-sm" style="flex:1" onclick="cerrarEmoji()">Cancelar</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -282,6 +370,46 @@ function colorStyle(c){
   if(!col)return'';
   return`background:${col.bg};color:${col.txt};`;
 }
+
+
+// ===== Emoticonos por producto =====
+// Se eligen solos según el nombre. Si en Ajustes eliges uno a mano, se guarda en la columna "emoji".
+const EMOJI_REGLAS=[
+  ['patatas? fritas|chips','🍟'],['jamon|paleta','🍖'],['chorizo|salchichon|salchicha|fuet|longaniza|sobrasada','🌭'],
+  ['bacon|beicon|panceta','🥓'],['pollo|pechuga|alitas?','🍗'],['hamburguesa','🍔'],['lomo|ternera|cerdo|carne|solomillo|entrecot|costilla','🥩'],
+  ['queso|mahon|mozzarella|parmesano|emmental|cheddar','🧀'],['huevos?','🥚'],['mantequilla|margarina','🧈'],
+  ['leche|nata|yogur','🥛'],['croissant|cruasan|bolleria|ensaimada|magdalena','🥐'],['bocadillo|sandwich','🥪'],
+  ['baguette|barra de pan|pan\\b|panes|chapata|pan ','🥖'],['harina','🌾'],['arroz','🍚'],['pizza','🍕'],
+  ['pasta|espagueti|macarron|tallarin|lasana','🍝'],['salsa|ketchup|mayonesa|mostaza|alioli','🥫'],['tomate','🍅'],
+  ['lechuga|rucula|canonigo|espinaca','🥬'],['ensalada','🥗'],['patata','🥔'],['cebolla','🧅'],['ajo','🧄'],
+  ['pimiento','🫑'],['zanahoria','🥕'],['pepino|calabacin','🥒'],['aguacate','🥑'],['champinon|seta','🍄'],['maiz','🌽'],
+  ['limon|lima','🍋'],['naranja|mandarina','🍊'],['manzana','🍎'],['platano','🍌'],['fresa','🍓'],['uva','🍇'],
+  ['pina','🍍'],['sandia','🍉'],['melon','🍈'],['cereza','🍒'],['melocoton','🍑'],['fruta','🍎'],
+  ['aceituna|oliva|aceite','🫒'],['almendra|nuez|cacahuete|pistacho|frutos secos','🥜'],
+  ['pimienta|pimenton|oregano|especia|guindilla','🌶️'],['sal\\b|sal ','🧂'],['azucar|sacarina','🍬'],
+  ['chocolate|cacao|nutella','🍫'],['helado','🍦'],['galleta','🍪'],['tarta|pastel|bizcocho','🍰'],['miel','🍯'],
+  ['cafe','☕'],['\\bte\\b|infusion|manzanilla','🍵'],['cerveza|barril|cana','🍺'],['vino|tinto|rioja|ribera','🍷'],
+  ['cava|champan|champagne','🥂'],['ginebra|\\bgin\\b|vodka|cocktail|coctel','🍸'],['ron\\b|whisky|licor|brandy|hierbas','🥃'],
+  ['agua','💧'],['zumo','🧃'],['refresco|cola|tonica|fanta|sprite|aquarius|nestea|vaso','🥤'],['hielo','🧊'],
+  ['salmon|atun|bacalao|merluza|pescado|lubina|dorada|sardina|anchoa|boqueron','🐟'],['gamba|langostino|marisco|cigala','🦐'],
+  ['pulpo|calamar|sepia','🐙'],['mejillon|almeja|ostra','🦪'],['vinagre','🍶'],
+  ['servilleta|papel|rollo|film|aluminio','🧻'],['plato','🍽️'],['cubierto|tenedor|cuchillo|cuchara','🍴'],['bolsa','🛍️'],
+  ['limpia|detergente|lejia|jabon|friegasuelos|desengrasante|lavavajillas','🧴'],['guante','🧤'],['carbon|gas\\b|lena','🔥'],
+];
+const EMOJI_AREA=[['cocina','🍳'],['barra|bar\\b','🍸'],['terraza','☀️'],['limpieza','🧽'],['camara|frio|congel','❄️'],['almacen','📦']];
+const EMOJI_SUGERIDOS=['🍖','🌭','🥓','🥩','🍗','🍔','🧀','🥚','🥛','🧈','🥖','🥐','🥪','🌾','🍚','🍝','🍕','🍅','🥬','🥗','🥔','🧅','🧄','🫑','🥕','🥒','🥑','🍄','🍋','🍊','🍎','🍌','🍓','🍇','🫒','🥜','🌶️','🧂','🍬','🍫','🍦','🍪','🍰','🍯','☕','🍵','🍺','🍷','🥂','🍸','🥃','💧','🧃','🥤','🧊','🐟','🦐','🐙','🦪','🥫','🧻','🍽️','🍴','🧴','🧽','🧤','🔥','📦'];
+const _emoCache={};
+function normTxt(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ')}
+function emojiAuto(nombre,area){
+  const key=nombre+'|'+area;
+  if(_emoCache[key])return _emoCache[key];
+  const n=' '+normTxt(nombre)+' ';
+  let e=null;
+  for(const[rx,em]of EMOJI_REGLAS){if(new RegExp('(^|\\s)('+rx+')').test(n)){e=em;break}}
+  if(!e){const a=normTxt(area);for(const[rx,em]of EMOJI_AREA){if(new RegExp(rx).test(a)){e=em;break}}}
+  return _emoCache[key]=e||'📦';
+}
+function emojiDe(p){return (p&&p.emoji)||emojiAuto(p?.nombre,p?.area)}
 
 function $(id){return document.getElementById(id)}
 function toast(msg,err){const t=$('toast');t.textContent=msg;t.classList.toggle('error',!!err);t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200)}
@@ -331,7 +459,7 @@ async function cargarPedidos(manual){
   try{
     const{data,error}=await sb.from('pedidos').select('*').eq('estado','pendiente').order('creado',{ascending:true});
     if(error)throw error;
-    DB.pedidos=data;renderAlmacen();
+    DB.pedidos=data;renderAlmacen(true);
     if(manual)toast('Pedidos actualizados');
   }catch(e){if(manual)toast('Error: '+(e.message||e),true)}
 }
@@ -344,7 +472,7 @@ async function cargarAlbaranes(manual){
 
     const{data,error}=await sb.from('albaranes').select('*').order('creado',{ascending:false}).limit(200);
     if(error)throw error;
-    DB.albaranes=data;renderAlbaranes();
+    DB.albaranes=data;renderAlbaranes();$('lista-albaranes').querySelectorAll('.pbody').forEach(e=>e.style.animation='none');
     if(manual)toast('Albaranes actualizados');
   }catch(e){if(manual)toast('Error: '+(e.message||e),true)}
 }
@@ -352,6 +480,7 @@ async function cargarAlbaranes(manual){
 function goTab(n){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.t==n));
   document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===n));
+  window.scrollTo({top:0,behavior:'smooth'});
   clearInterval(pollTimer);
   if(n===1){cargarPedidos();pollTimer=setInterval(cargarPedidos,20000)}
   if(n===2){cargarAlbaranes();pollTimer=setInterval(cargarAlbaranes,30000)}
@@ -382,7 +511,7 @@ function renderPedidoUI(){
   const prods=DB.productos.filter(p=>p.area===UI.area);
   $('prod-empty').style.display=prods.length?'none':'block';
   $('prod-empty').textContent=DB.productos.length?'No hay productos en esta área':'Importa tu catálogo en ⚙️ Ajustes';
-  $('prod-list').innerHTML=prods.map(p=>{
+  $('prod-list').innerHTML=prods.map((p,idx)=>{
     const k=UI.pv+'|'+p.id;
     const q=UI.cant[k]||0;
     const fmts=getFormatos(p);
@@ -392,7 +521,8 @@ function renderPedidoUI(){
     const options=fmts.map(f=>`<option value="${esc(f)}" ${selVal===f?'selected':''}>${esc(f)}</option>`).join('');
     const col=normColor(p.color);
     const st=col?colorStyle(col):'';
-    return `<div class="prow" style="${st}">
+    return `<div class="prow ${q>0?'has-q':''}" id="r_${k}" style="${st}--i:${Math.min(idx,20)}">
+      <span class="pemoji" id="e_${k}">${emojiDe(p)}</span>
       <span class="pname">${esc(p.nombre)}</span>
       <div class="prow-ctrl">
         <div class="fmt-wrap">
@@ -403,9 +533,9 @@ function renderPedidoUI(){
           <input class="fmt-libre ${isLibre?'show':''}" id="fl_${k}" type="text" placeholder="Escribe formato" value="${isLibre?esc(UI.fmtLibre[k]||''):''}" oninput="UI.fmtLibre['${k}']=this.value;renderResumen()">
         </div>
         <div class="qty">
-          <button class="qbtn" onclick="camb('${k}',-1)">−</button>
+          <button class="qbtn" onclick="camb('${k}',-1,event)">−</button>
           <span class="qval" id="q_${k}">${q}</span>
-          <button class="qbtn" onclick="camb('${k}',1)">+</button>
+          <button class="qbtn mas" onclick="camb('${k}',1,event)">+</button>
         </div>
       </div>
     </div>`;
@@ -419,10 +549,39 @@ function cambFmt(k,val){
   if(libre)libre.classList.toggle('show',val==='__libre__');
   renderResumen();
 }
-function camb(k,d){
-  UI.cant[k]=Math.max(0,(UI.cant[k]||0)+d);
-  const el=$('q_'+k);if(el)el.textContent=UI.cant[k];
+function camb(k,d,ev){
+  const antes=UI.cant[k]||0;
+  UI.cant[k]=Math.max(0,antes+d);
+  if(UI.cant[k]===antes)return;
+  const el=$('q_'+k);
+  if(el){el.textContent=UI.cant[k];reanimar(el,'bump')}
+  const row=$('r_'+k);if(row)row.classList.toggle('has-q',UI.cant[k]>0);
+  const em=$('e_'+k);
+  if(em){reanimar(em,'bump');if(ev)volarEmoji(em.textContent,ev,d<0)}
   renderResumen();
+}
+function reanimar(el,cls){el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls)}
+function volarEmoji(emo,ev,menos){
+  const b=ev.currentTarget||ev.target;const r=b.getBoundingClientRect();
+  const f=document.createElement('span');
+  f.className='flyemoji'+(menos?' menos':'');f.textContent=emo;
+  f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/2)+'px';
+  document.body.appendChild(f);setTimeout(()=>f.remove(),1000);
+}
+function confeti(emojis){
+  const btn=$('btn-enviar').getBoundingClientRect();
+  const lista=emojis.length?emojis:['🎉'];
+  for(let i=0;i<22;i++){
+    const c=document.createElement('span');c.className='confeti';
+    c.textContent=i%3===0?['🎉','✨','✅'][(i/3)%3]:lista[i%lista.length];
+    c.style.left=(btn.left+btn.width/2)+'px';c.style.top=(btn.top)+'px';
+    const ang=Math.random()*Math.PI,dist=120+Math.random()*180;
+    c.style.setProperty('--dx',(Math.cos(ang)*dist*(Math.random()<.5?-1:1))+'px');
+    c.style.setProperty('--dy',(-Math.sin(ang)*dist-60)+'px');
+    c.style.setProperty('--rot',(Math.random()*720-360)+'deg');
+    c.style.animationDelay=(Math.random()*120)+'ms';
+    document.body.appendChild(c);setTimeout(()=>c.remove(),1700);
+  }
 }
 function itemsCarrito(){
   const out=[];
@@ -435,18 +594,22 @@ function itemsCarrito(){
     const fmts=getFormatos(p);
     const fmtVal=UI.fmt[k]||fmts[0];
     const fmt=fmtVal==='__libre__'?(UI.fmtLibre[k]||'').trim()||fmts[0]:fmtVal;
-    out.push({producto_id:p.id,nombre:p.nombre,unidad:p.unidad,area:p.area,cantidad:q,formato:fmt,color:null});
+    out.push({producto_id:p.id,nombre:p.nombre,unidad:p.unidad,area:p.area,cantidad:q,formato:fmt,color:null,emoji:emojiDe(p)});
   }
   return out;
 }
 function renderResumen(){
   const items=itemsCarrito(),r=$('resumen'),b=$('btn-enviar');
-  if(!items.length){r.style.display='none';b.disabled=true;return}
+  if(!items.length){r.style.display='none';b.disabled=true;b.innerHTML='📤 Enviar pedido a almacén';UI.nPrev=0;return}
+  if(r.style.display==='none')reanimar(r,'resumen');
   r.style.display='block';b.disabled=false;
+  const nArt=items.length;
+  b.innerHTML=`📤 Enviar pedido a almacén <span class="ncount" id="ncount">${nArt}</span>`;
+  if(UI.nPrev!==nArt){reanimar($('ncount'),'bump');UI.nPrev=nArt}
   const porArea={};
   items.forEach(i=>{(porArea[i.area]=porArea[i.area]||[]).push(i)});
   r.innerHTML=Object.entries(porArea).map(([a,its])=>
-    `<div class="rarea">${esc(a)}</div>`+its.map(i=>`<div class="rrow"><span>${esc(i.nombre)}</span><b>${i.cantidad} × ${esc(i.formato)}</b></div>`).join('')
+    `<div class="rarea">${esc(a)}</div>`+its.map(i=>`<div class="rrow" style="animation:none"><span><span class="re">${i.emoji}</span>${esc(i.nombre)}</span><b>${i.cantidad} × ${esc(i.formato)}</b></div>`).join('')
   ).join('');
 }
 async function enviarPedido(){
@@ -457,15 +620,16 @@ async function enviarPedido(){
   try{
     const{error}=await sb.from('pedidos').insert({pv_id:pv.id,pv_nombre:pv.nombre,items,estado:'pendiente'});
     if(error)throw error;
+    confeti([...new Set(items.map(i=>i.emoji))]);
     items.forEach(i=>{UI.cant[UI.pv+'|'+i.producto_id]=0;});
-    renderPedidoUI();toast('✅ Pedido enviado a almacén');
-  }catch(e){toast('Error al enviar: '+(e.message||e),true)}
-  b.innerHTML='📤 Enviar pedido a almacén';
+    renderPedidoUI();toast('🚀 ¡Pedido enviado a almacén!');
+  }catch(e){toast('Error al enviar: '+(e.message||e),true);renderResumen()}
 }
 
-function renderAlmacen(){
+function renderAlmacen(sinAnim){
   const dot=$('dot-alm');
   dot.style.display=DB.pedidos.length?'inline-flex':'none';
+  if(String(DB.pedidos.length)!==dot.textContent&&DB.pedidos.length)reanimar(dot,'pop');
   dot.textContent=DB.pedidos.length;
   const L=$('lista-pedidos');
   if(!DB.pedidos.length){L.innerHTML='<div class="empty"><span class="ico">📭</span>No hay pedidos pendientes</div>';return}
@@ -478,8 +642,8 @@ function renderAlmacen(){
     if(n.amber)badges+=` <span class="badge b-am">${n.amber} parcial</span>`;
     if(n.green)badges+=` <span class="badge b-v">${n.green} ok</span>`;
     const rows=p.items.map((it,ix)=>`
-      <div class="irow ${it.color?'st-'+it.color:''}">
-        <span class="iname">${esc(it.nombre)} <span class="muted">· ${esc(it.area)}</span></span>
+      <div class="irow ${it.color?'st-'+it.color:''}" style="animation-delay:${Math.min(ix,15)*30}ms">
+        <span class="iname"><span class="iemo">${it.emoji||emojiAuto(it.nombre,it.area)}</span>${esc(it.nombre)} <span class="muted">· ${esc(it.area)}</span></span>
         <span class="ifmt">📦 ${esc(it.formato||it.unidad||'ud')}</span>
         <span class="iqty">${it.cantidad}</span>
         <div class="cbtns">
@@ -491,7 +655,7 @@ function renderAlmacen(){
       <div class="phead" onclick="togglePed('${p.id}')">
         <div class="pavatar">🏪</div>
         <div class="pinfo"><div class="ptitle">${esc(p.pv_nombre)}</div><div class="pmeta">${fechaES(p.creado)} ${badges}</div></div>
-        <span class="chev">${open?'▲':'▼'}</span>
+        <span class="chev ${open?'up':''}">▼</span>
       </div>
       <div class="pbody ${open?'open':''}">
         ${rows}
@@ -500,18 +664,20 @@ function renderAlmacen(){
           <button class="btn btn-verde btn-sm" onclick="generarAlbaran('${p.id}')">📄 Generar albarán</button>
         </div></div></div>`;
   }).join('');
+  if(sinAnim)L.querySelectorAll('.irow,.pbody').forEach(e=>e.style.animation='none');
 }
 function togglePed(id){UI.abiertos.has(id)?UI.abiertos.delete(id):UI.abiertos.add(id);renderAlmacen()}
 async function setColor(pid,ix,color){
   const p=DB.pedidos.find(x=>x.id===pid);if(!p)return;
   p.items[ix].color=p.items[ix].color===color?null:color;
-  renderAlmacen();
+  renderAlmacen(true);
   try{await sb.from('pedidos').update({items:p.items}).eq('id',pid)}
   catch(e){toast('Error guardando',true)}
 }
 async function todoVerde(pid){
   const p=DB.pedidos.find(x=>x.id===pid);if(!p)return;
-  p.items.forEach(i=>i.color='green');renderAlmacen();
+  p.items.forEach(i=>i.color='green');renderAlmacen(true);
+  toast('✅ Todo surtido');
   try{await sb.from('pedidos').update({items:p.items}).eq('id',pid)}
   catch(e){toast('Error guardando',true)}
 }
@@ -565,7 +731,7 @@ function renderAlbaranes(){
       its.map(i=>{
         const pl=i.color==='green'?'pl-g':i.color==='amber'?'pl-a':i.color==='red'?'pl-r':'';
         const tx=i.color==='green'?'Completo':i.color==='amber'?'Parcial':i.color==='red'?'Sin stock':'—';
-        return `<tr><td>${pl?'<span class="pill '+pl+'"></span>':''}${esc(i.nombre)}</td><td style="text-align:center">${i.cantidad}</td><td>${esc(i.formato||i.unidad||'ud')}</td><td style="text-align:right;color:var(--gris)">${tx}</td></tr>`;
+        return `<tr><td>${pl?'<span class="pill '+pl+'"></span>':''}${i.emoji||emojiAuto(i.nombre,i.area)} ${esc(i.nombre)}</td><td style="text-align:center">${i.cantidad}</td><td>${esc(i.formato||i.unidad||'ud')}</td><td style="text-align:right;color:var(--gris)">${tx}</td></tr>`;
       }).join('')
     ).join('');
     return `<div class="card">
@@ -574,7 +740,7 @@ function renderAlbaranes(){
         <div class="pinfo">
           <div class="ptitle">${esc(a.pv_nombre)} <span class="alb-num">${esc(a.numero)}</span></div>
           <div class="pmeta">${fechaES(a.creado)} ${bm[a.estado]||''}</div>
-        </div><span class="chev">${open?'▲':'▼'}</span>
+        </div><span class="chev ${open?'up':''}">▼</span>
       </div>
       <div class="pbody ${open?'open':''}">
         <div class="alb-doc">
@@ -631,7 +797,8 @@ function renderAdmin(){
     const cpBtns=COLORES_ADMIN.map(c=>`<button class="cp-btn ${colActual===c.k?'sel':''}" style="background:${c.bg}" title="${c.k}" onclick="setColorProd('${p.id}','${c.k}')"></button>`).join('');
     const st=colActual?colorStyle(colActual):'';
     return `<div class="lrow" style="flex-direction:column;align-items:flex-start;gap:6px;${st}">
-      <div style="display:flex;width:100%;align-items:center">
+      <div style="display:flex;width:100%;align-items:center;gap:10px">
+        <button class="emo-btn" title="Cambiar emoticono" onclick="abrirEmoji('${p.id}')">${emojiDe(p)}</button>
         <span class="nom"><b>${esc(p.nombre)}</b> <span class="muted">· ${esc(p.unidad)} · ${esc(p.area)}</span></span>
         <button class="del" onclick="borrarProducto('${p.id}')">🗑️</button>
       </div>
@@ -647,6 +814,33 @@ function renderAdmin(){
       </div>
     </div>`;
   }).join('')||'<div class="lrow"><span class="nom muted">Catálogo vacío</span></div>';
+}
+
+
+// ===== Selector de emoticono (Ajustes) =====
+let emoProd=null;
+function abrirEmoji(id){
+  const p=DB.productos.find(x=>x.id===id);if(!p)return;
+  emoProd=id;
+  $('emo-titulo').textContent=emojiDe(p)+' '+p.nombre;
+  const actual=emojiDe(p);
+  $('emo-grid').innerHTML=EMOJI_SUGERIDOS.map(e=>`<button class="${e===actual?'sel':''}" onclick="guardarEmoji('${e}')">${e}</button>`).join('');
+  $('emo-libre').value='';
+  $('overlay-emoji').classList.add('show');
+}
+function cerrarEmoji(){$('overlay-emoji').classList.remove('show');emoProd=null}
+async function guardarEmoji(e){
+  const p=DB.productos.find(x=>x.id===emoProd);if(!p||!sb)return cerrarEmoji();
+  const{error}=await sb.from('productos').update({emoji:e||null}).eq('id',p.id);
+  if(error){
+    if(/emoji/i.test(error.message))toast('Falta la columna "emoji" en Supabase (mira las instrucciones)',true);
+    else toast('Error: '+error.message,true);
+    return;
+  }
+  p.emoji=e||null;
+  const t=DB.todosProductos.find(x=>x.id===p.id);if(t)t.emoji=p.emoji;
+  cerrarEmoji();renderAdmin();renderPedidoUI();
+  toast((e||emojiAuto(p.nombre,p.area))+' Emoticono guardado');
 }
 
 async function setColorProd(prodId, color){
